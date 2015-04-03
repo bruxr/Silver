@@ -47,6 +47,16 @@ abstract class Base
   {
     return count($this->movies) > 0;
   }
+
+  /**
+   * Returns the movies we have collected.
+   *
+   * @return array
+   **/
+  public function getMovies()
+  {
+    return $this->movies;
+  }
   
   /**
    * Loads a page and passes it to phpQuery so it is available
