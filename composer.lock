@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b08c4c5c83b8e101e732dbea6204c984",
+    "hash": "de35b3acd607533244092724585a1422",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -221,6 +221,46 @@
                 "string"
             ],
             "time": "2014-12-20 21:24:13"
+        },
+        {
+            "name": "electrolinux/phpquery",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/electrolinux/phpquery.git",
+                "reference": "aa09e7af2e8d9a965102cf50d9b657aca96fd013"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/electrolinux/phpquery/zipball/aa09e7af2e8d9a965102cf50d9b657aca96fd013",
+                "reference": "aa09e7af2e8d9a965102cf50d9b657aca96fd013",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "phpQuery/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tobiasz Cudnik",
+                    "email": "tobiasz.cudnik@gmail.com",
+                    "homepage": "https://github.com/TobiaszCudnik",
+                    "role": "Developer"
+                },
+                {
+                    "name": "didier Belot",
+                    "role": "Packager"
+                }
+            ],
+            "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
+            "homepage": "http://code.google.com/p/phpquery/",
+            "time": "2014-08-08 09:03:54"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -3147,7 +3187,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "electrolinux/phpquery": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
