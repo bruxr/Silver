@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Scrapers;
+
+use GuzzleHttp\Client;
+use phpQuery;
+
+/**
+ * Scraper Base
+ *
+ * Base class for all classes responsible for scraping movie schedules off
+ * our client cinema websites. This class provides several convenience methods
+ * for fetching and sanitation of input data.
+ *
+ * @package Silver
+ * @author brux
+ * @since 0.1.0
+ */
+abstract class Base
+{
+  
+  /**
+   * All our collected movies.
+   *
+   * @var array
+   */
+  protected $movies = [];
+  
+  /**
+   * Does the actual scraping of movie schedules.
+   *
+   * @return void
+   */
+  abstract public function fetch();
+  
+  /**
+   * Returns TRUE if we have collected schedules.
+   *
+   * @return bool
+   */
+  public function hasMovies()
+  {
+    return count($this->movies) > 0;
+  }
+  
+  /**
+   * Loads a page and passes it to phpQuery so it is available
+   * for parsing and processing.
+   *
+   * @param string $url page url
+   * @return phpQuery
+   */
+  protected function loadPage($url)
+  {
+    $client = new Client();
+    return phpQuery::newDocumentHTML($client->get($url)->getBody());
+  }
+  
+  /**
+   * General purpose cleaning function.
+   *
+   * @param string $input input string
+   * @return string
+   */
+  protected function sanitize($input)
+  {
+    return strip_tags(trim($input));
+  }
+  
+  public function cleanMovieTitle($title)
+  {
+    return $this->sanitize($title);
+  }
+  
+  public function cleanCinemaName($name)
+  {
+    if ( preg_match('(Cinema\s[0-9])', $name, $matches) )
+    {
+      return $matches[0];
+    }
+    else
+    {
+      return 'Unknown Cinema';
+    }
+  }
+   
+}
