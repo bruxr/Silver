@@ -11,8 +11,8 @@
 
 namespace App\Scrapers;
 
+use Log;
 use Exception;
-use App\Services\Log;
 
 class Abreeza extends Base
 {
@@ -163,7 +163,6 @@ class Abreeza extends Base
         $m[$title] = $movie;
       }
     }
-    dump($m);
     return $m;
   }
 
