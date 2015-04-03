@@ -20,6 +20,11 @@ abstract class Base
 {
   
   /**
+   * Contains the official MTRCB ratings.
+   */
+  protected static $RATINGS = ['G', 'PG', 'PG-13', 'R-16', 'R-18'];
+  
+  /**
    * All our collected movies.
    *
    * @var array
