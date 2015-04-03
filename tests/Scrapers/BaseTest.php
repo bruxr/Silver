@@ -2,10 +2,10 @@
 
 use App\Scrapers\Base;
 
-class BaseTest extends PHPUnit_Framework_TestCase
+class BaseTest extends TestCase
 {
   
-  protected function setUp()
+  public function setUp()
   {
     $this->stub = $this->getMockForAbstractClass('App\Scrapers\Base');
   }
