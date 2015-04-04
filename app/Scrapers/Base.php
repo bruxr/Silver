@@ -2,7 +2,6 @@
 
 namespace App\Scrapers;
 
-use GuzzleHttp\Client;
 use phpQuery;
 
 /**
@@ -18,7 +17,7 @@ use phpQuery;
  */
 abstract class Base
 {
-  
+
   /**
    * Contains the official MTRCB ratings.
    */
@@ -67,8 +66,7 @@ abstract class Base
    */
   protected function loadPage($url)
   {
-    $client = new Client();
-    return phpQuery::newDocumentHTML($client->get($url)->getBody());
+    return phpQuery::newDocumentHTML(file_get_contents($url));
   }
   
   /**
