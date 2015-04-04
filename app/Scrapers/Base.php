@@ -51,7 +51,7 @@ abstract class Base
    * Returns the movies we have collected.
    *
    * @return array
-   **/
+   */
   public function getMovies()
   {
     return $this->movies;
