@@ -59,7 +59,7 @@ class Abreeza extends Base
     // Log a message if we failed to extract movies
     if ( empty($tables) )
     {
-      throw new Exception('Failed to extract Abreeza movies!');
+      throw new Exception('[Abreeza] Failed to extract movies!');
     }
     
     return $tables;
