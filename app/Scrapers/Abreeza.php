@@ -14,6 +14,7 @@ namespace App\Scrapers;
 use App\Exceptions\ParseException;
 
 use Log;
+use Carbon\Carbon;
 
 class Abreeza extends Base
 {
@@ -45,8 +46,7 @@ class Abreeza extends Base
     $this->page = $this->loadPage(self::URL);
     
     $blocks = $this->extractBlocks();
-    $movies = $this->processBlocks($blocks);
-    $this->movies = $this->consolidate($movies);
+    $this->processBlocks($blocks);
     
     return $this;
     
@@ -69,66 +69,74 @@ class Abreeza extends Base
   
   protected function processBlocks($blocks)
   {
-    $movies = [];
     foreach ( $blocks as $block )
     {
-      $movies[] = $this->processMovie($block);
+      $this->processMovie(pq($block));
     }
-    return $movies;
   }
   
-  protected function processMovie($movie)
+  protected function processMovie($block)
   {
 
-    $movie = pq($movie);
-    $m = [];
-    $m['screening_times'] = [];
+    $is_3d = false;
+    
+    // If we failed to extract a title, log then stop.
+    $movie = strtolower(trim($block->find('.SEARCH_TITLE')->text()));
+    $movie = $this->cleanMovieTitle($movie);
+    if ( empty($movie) )
+    {
+      Log::critical('[Abreeza] Failed to extract a movie title.');
+      return;
+    }
+    else
+    {
+      // Extract 3D suffix
+      if ( preg_match('/^\(3d\)/', $movie) )
+      {
+        $is_3d = true;
+        $movie = preg_replace('/^\(3d\)\s/', '', $movie);
+      }
+      
+      // Create a new record if the movie doesn't exist yet
+      if ( ! isset($this->movies[$movie]) )
+      {
+        $this->movies[$movie] = [
+          'title' => $movie,
+          'screening_times' => []
+        ];
+      }
+    }
     
     // Make sure we have a valid cinema
-    $cinema = $movie->find('tr:eq(0)')->text();
+    $cinema = $block->find('tr:eq(0)')->text();
     $cinema = trim($cinema);
     if ( ! preg_match('/^Cinema [1-4]$/', $cinema) )
     {
       throw new ParseException('Abreeza', 'Invalid cinema name.', $cinema);
     }
-
-    $m['title'] = strtolower(trim($movie->find('.SEARCH_TITLE')->text()));
-
-    // If we failed to extract a title, log then stop.
-    if ( empty($m['title']) )
+    else
     {
-      Log::critical('[Abreeza] Failed to extract a movie title.');
-      return;
+      $cinema = (int) str_replace('Cinema ', '', $cinema);
     }
 
     // Extract the MTRCB rating and make sure it is a correct one.
-    $m['rating'] = str_replace('Rating: ', '',   $movie->find('.SEARCH_RATING')->text());
-    if ( ! in_array($m['rating'], static::$RATINGS) )
+    $rating = $block->find('.SEARCH_RATING')->text();
+    $rating = str_replace('Rating: ', '', $rating);
+    if ( ! in_array($rating, static::$RATINGS) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating for the movie "%s". Removing it for now.', $m['rating'], $m['title']));
-      unset($m['rating']);
-    }
-  
-    // Detect 3D movies
-    if ( preg_match('/^\(3d\)/', $m['title']) )
-    {
-      $is_3d = true;
-      $m['title'] = preg_replace('/^\(3d\)\s/', '', $m['title']);
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating for the movie "%s". Removing it for now.', $rating, $movie));
     }
     else
     {
-      $is_3d = false;
+      $this->movies[$movie]['rating'] = $rating;
     }
-
-    // Clean up the title
-    $m['title'] = $this->cleanMovieTitle($m['title']);
     
     // Extract the price
-    $price = str_replace('Price: ', '', $movie->find('.SEARCH_PRICE')->text());
+    $price = str_replace('Price: ', '', $block->find('.SEARCH_PRICE')->text());
     $price = trim($price);
     if ( ! preg_match('/^[0-9]+$/', $price) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price for the movie "%s".', $price, $m['title']));
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price for the movie "%s".', $price, $movie));
       $price = null;
     }
     else
@@ -137,21 +145,21 @@ class Abreeza extends Base
     }
     
     // Extract the date
-    $date = trim($movie->find('.SEARCH_DATE')->text());
+    $date = trim($block->find('.SEARCH_DATE')->text());
     if ( ! preg_match('/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s[0-9]{1,2},\s20[0-9]{2}$/i', $date) )
     {
       throw new ParseException('Abreeza', 'Invalid screening date.', $date);
     }
     
     // Extract screening times and build the date objects
-    foreach ( $movie->find('.SEARCH_SCHED') as $s )
+    foreach ( $block->find('.SEARCH_SCHED') as $s )
     {
       
       // Validate the time
       $s = trim(pq($s)->text());
       if ( ! preg_match('/((?:1[012]|[1-9]):[0-5][0-9]\s(?i)(?:am|pm))/', $s, $matches) )
       {
-        Log::warning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $m['title']));
+        Log::warning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $movie));
         continue;
       }
       else
@@ -161,7 +169,7 @@ class Abreeza extends Base
 
       $arr = [
         'cinema'  => $cinema,
-        'time'    => $date . ' ' . $s
+        'time'    => Carbon::parse($date . ' ' . $s)
       ];
 
       // Add ticket price if we have one
@@ -176,11 +184,9 @@ class Abreeza extends Base
         $arr['format'] = '3D';
       }
       
-      $m['screening_times'][] = $arr;
+      $this->movies[$movie]['screening_times'][] = $arr;
       
     }
-    
-    return $m;
 
   }
   
