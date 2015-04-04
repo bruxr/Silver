@@ -45,7 +45,7 @@ return [
 
 		'local' => [
 			'driver' => 'local',
-			'root'   => storage_path().'/app',
+			'root'   => APP_MODE == 'live' ? 'gs://'.env('APP_NAME').'.appspot.com/app' : storage_path().'/app',
 		],
 
 		's3' => [

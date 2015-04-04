@@ -1,5 +1,21 @@
 <?php
 
+if ( PHP_SAPI == 'cli' )
+{
+	define('APP_MODE', 'test');
+}
+else
+{
+	if ( $_SERVER['SERVER_NAME'] == 'localhost' )
+	{
+		define('APP_MODE', 'dev');
+	}
+	else
+	{
+		define('APP_MODE', 'live');
+	}
+}
+
 return [
 
 	/*
@@ -13,7 +29,7 @@ return [
 	|
 	*/
 
-	'debug' => env('APP_DEBUG'),
+	'debug' => APP_MODE == 'live' ? false : true,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -26,7 +42,7 @@ return [
 	|
 	*/
 
-	'url' => 'http://localhost',
+	'url' => APP_MODE == 'live' ? 'https://the-silver-app.appspot.com' : 'http://localhost:8080',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -39,7 +55,7 @@ return [
 	|
 	*/
 
-	'timezone' => 'UTC',
+	'timezone' => 'Asia/Manila',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -78,7 +94,7 @@ return [
 	|
 	*/
 
-	'key' => env('APP_KEY', 'SomeRandomString'),
+	'key' => env('APP_KEY'),
 
 	'cipher' => MCRYPT_RIJNDAEL_128,
 
@@ -95,7 +111,7 @@ return [
 	|
 	*/
 
-	'log' => 'daily',
+	'log' => APP_MODE == 'live' ? 'syslog' : 'daily',
 
 	/*
 	|--------------------------------------------------------------------------
