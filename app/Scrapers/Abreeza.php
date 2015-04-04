@@ -105,7 +105,7 @@ class Abreeza extends Base
     $m['rating'] = str_replace('Rating: ', '',   $movie->find('.SEARCH_RATING')->text());
     if ( ! in_array($m['rating'], static::$RATINGS) )
     {
-      Log:warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating.', $m['rating']));
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating.', $m['rating']));
       unset($m['rating']);
     }
   
