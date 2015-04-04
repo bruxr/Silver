@@ -93,10 +93,11 @@ class Abreeza extends Base
       return;
     }
 
-    // Extract the MTRCB rating and make sure it is the correct one.
+    // Extract the MTRCB rating and make sure it is a correct one.
     $m['rating'] = str_replace('Rating: ', '',   $movie->find('.SEARCH_RATING')->text());
     if ( ! in_array($m['rating'], static::$RATINGS) )
     {
+      Log:warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating.', $m['rating']));
       unset($m['rating']);
     }
   
