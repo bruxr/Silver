@@ -11,8 +11,9 @@
 
 namespace App\Scrapers;
 
+use App\Exceptions\ParseException;
+
 use Log;
-use Exception;
 
 class Abreeza extends Base
 {
@@ -59,7 +60,7 @@ class Abreeza extends Base
     // Log a message if we failed to extract movies
     if ( empty($tables) )
     {
-      throw new Exception('[Abreeza] Failed to extract movies!');
+      throw new ParseException('Abreeza', 'Failed to extract movies!');
     }
     
     return $tables;
@@ -83,7 +84,14 @@ class Abreeza extends Base
     $m = [];
     $m['screening_times'] = [];
     
+    // Make sure we have a valid cinema
     $cinema = $movie->find('tr:eq(0)')->text();
+    $cinema = trim($cinema);
+    if ( ! preg_match('/^Cinema [1-4]$/', $cinema) )
+    {
+      throw new ParseException('Abreeza', 'Invalid cinema name.', $cinema);
+    }
+
     $m['title'] = strtolower(trim($movie->find('.SEARCH_TITLE')->text()));
 
     // If we failed to extract a title, log then stop.
@@ -132,7 +140,7 @@ class Abreeza extends Base
     $date = trim($movie->find('.SEARCH_DATE')->text());
     if ( ! preg_match('/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s[0-9]{1,2},\s20[0-9]{2}$/i', $date) )
     {
-      throw new Exception(sprintf('[Abreeza] "%s" is not a valid date!', $date));
+      throw new ParseException('Abreeza', 'Invalid screening date.', $date);
     }
     
     // Extract screening times and build the date objects
@@ -140,7 +148,7 @@ class Abreeza extends Base
     {
       
       $s = trim(pq($s)->text());
-      if ( ! preg_match('/^[0-9]{1,2}\:[0-9]{2}\s(A|P)M$/', $s) )
+      if ( ! preg_match('/^(1[012]|[1-9]):[0-5][0-9](\s)+(?i)(am|pm)$/', $s) )
       {
         Log::warning(sprintf('[Abreeza] "%s" is not a valid time. Skipping.', $s));
         continue;
