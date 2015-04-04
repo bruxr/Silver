@@ -105,7 +105,7 @@ class Abreeza extends Base
     $m['rating'] = str_replace('Rating: ', '',   $movie->find('.SEARCH_RATING')->text());
     if ( ! in_array($m['rating'], static::$RATINGS) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating.', $m['rating']));
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating for the movie "%s". Removing it for now.', $m['rating'], $m['title']));
       unset($m['rating']);
     }
   
@@ -128,7 +128,7 @@ class Abreeza extends Base
     $price = trim($price);
     if ( ! preg_match('/^[0-9]+$/', $price) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price!', $price));
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price for the movie "%s".', $price, $m['title']));
       $price = null;
     }
     else
@@ -150,7 +150,7 @@ class Abreeza extends Base
       $s = trim(pq($s)->text());
       if ( ! preg_match('/^(1[012]|[1-9]):[0-5][0-9](\s)+(?i)(am|pm)$/', $s) )
       {
-        Log::warning(sprintf('[Abreeza] "%s" is not a valid time. Skipping.', $s));
+        Log::warning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $m['title']));
         continue;
       }
 
