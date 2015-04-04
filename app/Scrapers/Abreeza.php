@@ -148,6 +148,7 @@ class Abreeza extends Base
     {
       
       $s = trim(pq($s)->text());
+      $s = substr($s, 0, strlen($s) - 2);
       if ( ! preg_match('/^(1[012]|[1-9]):[0-5][0-9](\s)+(?i)(am|pm)$/', $s) )
       {
         Log::warning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $m['title']));
