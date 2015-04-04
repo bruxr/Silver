@@ -110,6 +110,9 @@ class Abreeza extends Base
     {
       $is_3d = false;
     }
+
+    // Clean up the title
+    $m['title'] = $this->cleanMovieTitle($m['title']);
     
     // Extract the price
     $price = str_replace('Price: ', '', $movie->find('.SEARCH_PRICE')->text());
