@@ -129,7 +129,11 @@ class Abreeza extends Base
     }
     
     // Extract the date
-    $date = $movie->find('.SEARCH_DATE')->text();
+    $date = trim($movie->find('.SEARCH_DATE')->text());
+    if ( ! preg_match('/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s[0-9]{1,2},\s20[0-9]{2}$/i', $date) )
+    {
+      throw new Exception(sprintf('[Abreeza] "%s" is not a valid date!', $date));
+    }
     
     // Extract screening times and build the date objects
     foreach ( $movie->find('.SEARCH_SCHED') as $s )
