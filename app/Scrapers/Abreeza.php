@@ -148,6 +148,7 @@ class Abreeza extends Base
         $arr['ticket']['price'] = $price;
       }
       
+      // Add a 3D designator if it is one.
       if ( $is_3d )
       {
         $arr['format'] = '3D';
