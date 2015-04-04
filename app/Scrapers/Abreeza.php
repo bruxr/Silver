@@ -17,6 +17,8 @@ use Exception;
 class Abreeza extends Base
 {
   
+  const SLUG = 'abreeza';
+
   /**
    * The page we will be scraping.
    *
