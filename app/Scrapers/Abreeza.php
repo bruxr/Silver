@@ -117,7 +117,16 @@ class Abreeza extends Base
     
     // Extract the price
     $price = str_replace('Price: ', '', $movie->find('.SEARCH_PRICE')->text());
-    $price = intval(trim($price));
+    $price = trim($price);
+    if ( ! preg_match('/^[0-9]+$/', $price) )
+    {
+      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price!', $price));
+      $price = null;
+    }
+    else
+    {
+      $price = (int) $price;
+    }
     
     // Extract the date
     $date = $movie->find('.SEARCH_DATE')->text();
@@ -130,11 +139,14 @@ class Abreeza extends Base
       $s = substr($s, 0, strlen($s) - 2);
       $arr = [
         'cinema'  => $cinema,
-        'time'    => $date . ' ' . $s,
-        'ticket'  => [
-          'price'   => $price
-        ]
+        'time'    => $date . ' ' . $s
       ];
+
+      // Add ticket price if we have one
+      if ( $price !== null )
+      {
+        $arr['ticket']['price'] = $price;
+      }
       
       if ( $is_3d )
       {
