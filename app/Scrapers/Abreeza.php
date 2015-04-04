@@ -186,22 +186,28 @@ class Abreeza extends Base
   
   protected function consolidate($movies)
   {
+    
     $m = [];
+    
+    $map = [];
+    $i = 0;
+    
     foreach ( $movies as $movie )
     {
-      if ( isset($m[$movie['title']]) )
+      if ( isset($map[$movie['title']]) )
       {
-        $m[$movie['title']]['screening_times'] = array_merge($m[$movie['title']]['screening_times'], $movie['screening_times']);
+        $index = $map[$movie['title']];
+        $m[$index]['screening_times'] = array_merge($m[$index]['screening_times'], $movie['screening_times']);
         if ( isset($movie['rating']) )
         {
-          $m[$movie['title']]['rating'] = $movie['rating'];
+          $m[$index]['rating'] = $movie['rating'];
         }
       }
       else
       {
-        $title = $movie['title'];
-        unset($movie['title']);
-        $m[$title] = $movie;
+        $map[$movie['title']] = $i;
+        $m[$i] = $movie;
+        $i++;
       }
     }
     return $m;
