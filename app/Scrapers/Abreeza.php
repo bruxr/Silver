@@ -139,7 +139,13 @@ class Abreeza extends Base
     foreach ( $movie->find('.SEARCH_SCHED') as $s )
     {
       
-      $s = pq($s)->text();
+      $s = trim(pq($s)->text());
+      if ( ! preg_match('/^[0-9]{1,2}\:[0-9]{2}\s(A|P)M$/', $s) )
+      {
+        Log::warning(sprintf('[Abreeza] "%s" is not a valid time. Skipping.', $s));
+        continue;
+      }
+
       $s = substr($s, 0, strlen($s) - 2);
       $arr = [
         'cinema'  => $cinema,
