@@ -12,12 +12,11 @@
 namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
+use App\Services\Log;
 
 use DatePeriod;
 use DateInterval;
-
 use Carbon\Carbon;
-use Log;
 
 class Nccc extends Base
 {

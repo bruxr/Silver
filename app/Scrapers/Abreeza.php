@@ -12,8 +12,8 @@
 namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
+use App\Services\Log;
 
-use Log;
 use Carbon\Carbon;
 
 class Abreeza extends Base
