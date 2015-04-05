@@ -31,6 +31,7 @@ class SmMalls extends Base
   {
     $movies = $this->fetchMovies();
     $this->processMovies($movies);
+    dump($this->movies);
     return $this;
   }
   
@@ -111,6 +112,9 @@ class SmMalls extends Base
         $format = $this->extractFormat($r['FilmFormat']);
         $price = $this->processPrice($movie, $r['Price']);
         $time = $this->processTime($r['StartTime']);
+        $rating = $this->processMtrcbRating($r['MtrcbRating']);
+      
+        $this->movies[$movie]['rating'] = $rating;
       
         $arr = [
           'cinema' => $cinema,
@@ -179,6 +183,24 @@ class SmMalls extends Base
   protected function processTime($time)
   {
     return Carbon::parse($time);
+  }
+
+  protected function processMtrcbRating($rating)
+  {
+    $rating = trim($rating);
+    if ( $rating == 'NYR' )
+    {
+      return null;
+    }
+    elseif ( ! in_array($rating, self::$RATINGS) )
+    {
+      Log::warning(sprintf('[SM] Unknown MTRCB rating %s. Ignoring rating.', $rating));
+      return null;
+    }
+    else
+    {
+      return $rating;
+    }
   }
 
 }
