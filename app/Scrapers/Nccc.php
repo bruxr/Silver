@@ -174,7 +174,6 @@ class Nccc extends Base
         }
         
         $arr = [
-          'mall' => 'nccc',
           'cinema' => $cinema,
           'time' => $time
         ];
