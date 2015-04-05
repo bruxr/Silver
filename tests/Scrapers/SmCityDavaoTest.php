@@ -2,7 +2,7 @@
 
 use App\Scrapers\SmCityDavao;
 
-class SmCityDavaoTest extends TestCase
+class SmCityDavaoTest extends PHPUnit_Framework_TestCase
 {
   
   /**

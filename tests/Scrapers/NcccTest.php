@@ -2,7 +2,7 @@
 
 use App\Scrapers\Nccc;
 
-class NcccTest extends TestCase
+class NcccTest extends PHPUnit_Framework_TestCase
 {
   
   /**
