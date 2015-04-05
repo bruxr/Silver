@@ -7,7 +7,7 @@
         "electrolinux/phpquery": "dev-master",
         "monolog/monolog": "~1.13",
         "symfony/yaml": "~2.6",
-        "nesbot/carbon": "~1.18",
+        "nesbot/carbon": "~1.18"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
