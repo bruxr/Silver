@@ -77,7 +77,7 @@ class Log
     self::instance()->getMonolog()->addError($message);
   }
   
-  public static function warn($message)
+  public static function warning($message)
   {
     self::instance()->getMonolog()->addWarning($message);
   }
