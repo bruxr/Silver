@@ -3,7 +3,6 @@
 	"description": "Davao's moves in one place.",
 	"require": {
         "slim/slim": "2.*",
-        "guzzlehttp/guzzle": "*",
         "electrolinux/phpquery": "dev-master",
         "monolog/monolog": "~1.13",
         "symfony/yaml": "~2.6",
