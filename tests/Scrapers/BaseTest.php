@@ -2,7 +2,7 @@
 
 use App\Scrapers\Base;
 
-class BaseTest extends TestCase
+class BaseTest extends PHPUnit_Framework_TestCase
 {
   
   public function setUp()

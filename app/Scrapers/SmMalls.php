@@ -13,7 +13,7 @@
 namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
-use Log;
+use App\Services\Log;
 
 class SmMalls extends Base
 {

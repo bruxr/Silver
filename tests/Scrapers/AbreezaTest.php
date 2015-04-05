@@ -2,7 +2,7 @@
 
 use App\Scrapers\Abreeza;
 
-class AbreezaTest extends TestCase
+class AbreezaTest extends PHPUnit_Framework_TestCase
 {
   
   /**
