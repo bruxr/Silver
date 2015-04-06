@@ -31,7 +31,6 @@ class SmMalls extends Base
   {
     $movies = $this->fetchMovies();
     $this->processMovies($movies);
-    dump($this->movies);
     return $this;
   }
   
