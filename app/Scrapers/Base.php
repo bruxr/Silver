@@ -70,6 +70,16 @@ abstract class Base
   }
   
   /**
+   * Returns TRUE if the provided MTRCB rating is a valid one.
+   *
+   * @return bool
+   */
+  protected function isValidMtrcbRating($rating)
+  {
+    return in_array($rating, static::$RATINGS);
+  }
+  
+  /**
    * General purpose cleaning function.
    *
    * @param string $input input string
