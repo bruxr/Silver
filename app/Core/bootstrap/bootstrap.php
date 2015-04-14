@@ -21,6 +21,6 @@ $app = new Slim(array(
 ));
 
 // Setup our services
-$app->services = new Auryn\Provider(new Auryn\ReflectionPool());
+$app->box = new Pimple\Container();
 $setup_services = require_once CORE . '/bootstrap/services.php';
-$setup_services($app->services);
+$setup_services($app->box);

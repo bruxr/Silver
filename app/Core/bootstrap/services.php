@@ -1,28 +1,40 @@
 <?php
 
-use App\Core\Datastore;
-use Symfony\Component\Yaml;
-
-return function($services) {
+return function($box)
+{
   
-  $scopes = [
+  // Google auth scopes
+  $box['google_auth_scopes'] = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/datastore'
   ];
-  $key = CONFIG . '/silver-key.p12';
   
-  // Setup Google client
-  $gc = new Google_Client();
-  $gc->setApplicationName(getenv('APP_ID'));
-  if ( file_exists($key) )
-  {
-    $c = new Google_Auth_AssertionCredentials(getenv('APP_SERVICE_ACCT'), $scopes, file_get_contents($key));
-    $gc->setAssertionCredentials($c);
-  }
-  $services->share($gc);
-
-  // Setup datastore
-  $services->share(new Datastore\Schema(new Yaml\Parser, CONFIG . '/schema.yml'));
-  $services->share(new Datastore\DS($services->make('App\Core\Datastore\Schema'), $services->make('Google_Client'), getenv('APP_ID')));
+  // Google_Auth_AssertionCredentials
+  $box['google_auth_assertioncredentials'] = function($b) {
+    $key = CONFIG . '/silver-key.p12';
+    return new Google_Auth_AssertionCredentials(getenv('APP_SERVICE_ACCT'), $b['google_auth_scopes'], file_get_contents($key));
+  };
+  
+  // Google_Client
+  $box['google_client'] = function($b) {
+    $gc = new Google_Client();
+    $gc->setApplicationName(getenv('APP_ID'));
+    $gc->setAssertionCredentials($b['google_auth_assertioncredentials']);
+  };
+  
+  // Yaml Parser
+  $box['yaml_parser'] = function($b) {
+    return new Symfony\ComponentYaml\Parser();
+  };
+  
+  // Datastore Schema
+  $box['datastore_schema'] = function($b) {
+    return new App\Core\Datastore\Schema($b['yaml_parser'], CONFIG . '/schema.yml');
+  };
+  
+  // DS
+  $box['datastore'] = function($b) {
+    return new App\Core\Datastore\DS($b['datastore_schema'], $b['google_client'], getenv('APP_ID'));
+  };
   
 };
