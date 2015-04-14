@@ -20,6 +20,7 @@ return function($box)
     $gc = new Google_Client();
     $gc->setApplicationName(getenv('APP_ID'));
     $gc->setAssertionCredentials($b['google_auth_assertioncredentials']);
+    return $gc;
   };
   
   // Yaml Parser
