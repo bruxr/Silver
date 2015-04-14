@@ -21,6 +21,6 @@ $app = new Slim(array(
 ));
 
 // Setup our services
-$app->box = new Pimple\Container();
+$app->services = new Pimple\Container();
 $setup_services = require_once CORE . '/bootstrap/services.php';
-$setup_services($app->box);
+$setup_services($app->services);
