@@ -19,7 +19,6 @@ $app = new Slim(array(
   'cookies.httponly'    => true,
   'cookies.secret_key'  => getenv('COOKIE_SECRET')
 ));
-$app->add(new Environment());
 
 // Setup our services
 $app->services = new Auryn\Provider(new Auryn\ReflectionPool());
