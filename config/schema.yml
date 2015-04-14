@@ -1,0 +1,32 @@
+movie:
+  title: string
+  overview: string
+  runtime: integer
+  poster: string
+  backdrop: string
+  rating: string
+  artists: list
+  genres: list
+  scores: list
+  updated: datetime
+  created: datetime
+  status: string
+
+screening:
+  belongsTo: movie
+  mall: key
+  time: 
+    type: datetime
+    indexed: true
+  format: string
+  ticket: list
+  
+mall:
+  name: string
+  phone: string
+  address: string
+  website: string
+  latitude: string
+  longitude: string
+  scraper: string
+  status: string
