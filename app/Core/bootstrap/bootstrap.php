@@ -2,10 +2,7 @@
 
 use App\Middleware\Environment;
 use App\Services\Log;
-use Auryn\Provider;
-use Auryn\ReflectionPool;
 use Slim\Slim;
-use Symfony\Component\Yaml;
 
 define('ROOT', dirname(dirname(dirname(dirname(__FILE__)))));
 define('APP', ROOT . '/app');
@@ -24,15 +21,9 @@ $app = new Slim(array(
 ));
 $app->add(new Environment());
 
-// Setup our DI
-$app->services = new Provider(new ReflectionPool());
-
-// Setup datastore
-$yaml = new Yaml\Parser;
-
-// Setup the Database
-//$yaml = new Parser();
-//dump($yaml->parse(file_get_contents(APP . '/schema.yml')));
-//DS::initialize($yaml->parse(file_get_contents(APP . '/schema.yml')));
+// Setup our services
+$app->services = new Auryn\Provider(new Auryn\ReflectionPool());
+$setup_services = require_once CORE . '/bootstrap/services.php';
+$setup_services($app->services);
 
 $app->run();
