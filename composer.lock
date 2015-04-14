@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4323f3a027a431c5230bf88aa9d748d0",
+    "hash": "97310618a1d77ed2d04b8f851ebb67a8",
     "packages": [
         {
             "name": "electrolinux/phpquery",
@@ -407,20 +407,23 @@
         },
         {
             "name": "rdlowrey/auryn",
-            "version": "dev-master",
+            "version": "v0.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rdlowrey/Auryn.git",
-                "reference": "500b08ec9942eb8b647b128fa13942d45754e3d4"
+                "reference": "bfee56a9e0d2e71b04f04236cb8eff2f8cb1c4fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rdlowrey/Auryn/zipball/500b08ec9942eb8b647b128fa13942d45754e3d4",
-                "reference": "500b08ec9942eb8b647b128fa13942d45754e3d4",
+                "url": "https://api.github.com/repos/rdlowrey/Auryn/zipball/bfee56a9e0d2e71b04f04236cb8eff2f8cb1c4fa",
+                "reference": "bfee56a9e0d2e71b04f04236cb8eff2f8cb1c4fa",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
             },
             "type": "library",
             "autoload": {
@@ -458,7 +461,7 @@
                 "dic",
                 "ioc"
             ],
-            "time": "2015-03-12 19:52:27"
+            "time": "2014-10-27 15:01:04"
         },
         {
             "name": "react/promise",
@@ -1867,8 +1870,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "electrolinux/phpquery": 20,
-        "google/apiclient": 20,
-        "rdlowrey/auryn": 20
+        "google/apiclient": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
