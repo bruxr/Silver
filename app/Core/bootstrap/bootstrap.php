@@ -24,5 +24,3 @@ $app = new Slim(array(
 $app->services = new Auryn\Provider(new Auryn\ReflectionPool());
 $setup_services = require_once CORE . '/bootstrap/services.php';
 $setup_services($app->services);
-
-$app->run();
