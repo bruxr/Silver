@@ -73,6 +73,55 @@ class Entity
   }
   
   /**
+   * Sets the entity key.
+   * 
+   * @param string|array|Google_Service_Datastore_Key $paths,.. entity keys including any ancestors or the key object itself
+   * @return void
+   */
+  public function setKey($paths)
+  {
+    
+    if ( $paths instanceof Google_Service_Datastore_Key )
+    {
+      $key = $paths;
+    }
+    else
+    {
+      // Automatic key IDs -> 'car'
+      if ( is_string($paths) )
+      {
+        $paths = [$paths];
+      }
+      // Custom key name -> ['car', 'r8']
+      elseif ( ! is_array($paths[0]) )
+      {
+        $paths = [$paths];
+      }
+    
+      $p = [];
+      foreach ( $paths as $i )
+      {
+        $kpe = new Google_Service_Datastore_KeyPathElement();
+        if ( is_string($i) )
+        {
+          $kpe->setKind($i);
+        }
+        else
+        {
+          $kpe->setKind($i[0]);
+          $kpe->setName($i[1]);
+        }
+        $p[] = $kpe;
+      }
+      $key = new Google_Service_Datastore_Key();
+      $key->setPath($p);
+    }
+    
+    $this->entity->setKey($key);
+    $this->findEntityKind();
+  }
+  
+  /**
    * Returns the entity's kind.
    *
    * @return string
@@ -237,48 +286,6 @@ class Entity
   protected function setWrappedObject($entity)
   {
     $this->entity = $entity;
-  }
-  
-  /**
-   * Sets the entity key.
-   * 
-   * @param string|array $paths,.. entity keys including any ancestors
-   * @return void
-   */
-  protected function setKey($paths)
-  {
-    
-    // Automatic key IDs -> 'car'
-    if ( is_string($paths) )
-    {
-      $paths = [$paths];
-    }
-    // Custom key name -> ['car', 'r8']
-    elseif ( ! is_array($paths[0]) )
-    {
-      $paths = [$paths];
-    }
-    
-    $p = [];
-    foreach ( $paths as $i )
-    {
-      $kpe = new Google_Service_Datastore_KeyPathElement();
-      if ( is_string($i) )
-      {
-        $kpe->setKind($i);
-      }
-      else
-      {
-        $kpe->setKind($i[0]);
-        $kpe->setName($i[1]);
-      }
-      $p[] = $kpe;
-    }
-    $key = new Google_Service_Datastore_Key();
-    $key->setPath($p);
-    $this->entity->setKey($key);
-    
-    $this->findEntityKind();
   }
   
   /**
