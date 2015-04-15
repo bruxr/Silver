@@ -25,7 +25,7 @@ return function($box)
   
   // Yaml Parser
   $box['yaml_parser'] = function($b) {
-    return new Symfony\ComponentYaml\Parser();
+    return new Symfony\Component\Yaml\Parser();
   };
   
   // Datastore Schema
