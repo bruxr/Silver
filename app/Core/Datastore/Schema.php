@@ -91,4 +91,16 @@ class Schema
     }
   }
   
+  /**
+   * Adds a schema for an entity kind.
+   *
+   * @param string $kind entity kind
+   * @param array $schema entity schema
+   * @return void
+   */
+  public function setSchema($kind, array $schema)
+  {
+    $this->schema[$kind] = $schema;
+  }
+  
 }

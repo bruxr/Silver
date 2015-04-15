@@ -52,4 +52,13 @@ class SchemaTest extends TestCase
     $this->assertFalse($this->schema->isFieldIndexed('car', 'missing'));
   }
   
+  public function testSetSchema()
+  {
+    $this->schema->setSchema('supercar', ['name' => 'string', 'carbon_fiber' => ['type' => 'boolean', 'indexed' => true]]);
+    $this->assertEquals('string', $this->schema->getFieldType('supercar', 'name'));
+    $this->assertFalse($this->schema->isFieldIndexed('supercar', 'name'));
+    $this->assertEquals('boolean', $this->schema->getFieldType('supercar', 'carbon_fiber'));
+    $this->assertTrue($this->schema->isFieldIndexed('supercar', 'carbon_fiber'));
+  }
+  
 }
