@@ -19,6 +19,13 @@ class Schema
 {
   
   /**
+   * The schema.
+   *
+   * @var array
+   */
+  protected $schema;
+  
+  /**
    * Loads the schema from our schema file.
    *
    * @param Parser $parser YAML Parser
