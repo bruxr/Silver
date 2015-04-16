@@ -3,6 +3,8 @@
 interface DatastoreInterface
 {
   
+  public function getName();
+  
   public function create($type, array $properties);
   
   public function find($type, array $params);

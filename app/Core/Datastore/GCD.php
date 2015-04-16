@@ -73,6 +73,11 @@ class GCD implements DatastoreInterface
     $this->dataset = $service->datasets;
   }
   
+  public function getName()
+  {
+    return 'gcd';
+  }
+  
   public function create($kind, array $properties)
   {
     // If we have an id, use it
