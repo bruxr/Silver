@@ -33,6 +33,11 @@ return function($box)
     return new App\Core\Datastore\Schema($b['yaml_parser'], CONFIG . '/schema.yml');
   };
   
+  // GCD
+  $box['gcd'] = function($b) {
+    return new App\Core\Datastore\GCD(getenv('APP_ID'), $b['google_client'], $b['datastore_schema']);
+  };
+  
   // DS
   $box['datastore'] = function($b) {
     return new App\Core\Datastore\DS($b['datastore_schema'], $b['google_client'], getenv('APP_ID'));
