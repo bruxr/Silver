@@ -1,7 +1,6 @@
 <?php namespace App\Core\Datastore;
 
 use Exception;
-use App\Core\Datastore\Entity;
 use App\Core\Datastore\Schema;
 use Google_Client;
 use Google_Service_Datastore as Datastore;
