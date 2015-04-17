@@ -32,7 +32,7 @@ use Google_Service_Datastore_RunQueryRequest as RunQueryRequest;
  * @author Brux
  * @since 0.1.0
  */
-class GCD implements DatastoreInterface
+class GCD implements DriverInterface
 {
   
   /**

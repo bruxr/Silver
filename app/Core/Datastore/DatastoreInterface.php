@@ -1,6 +1,6 @@
 <?php namespace App\Core\Datastore;
 
-interface DatastoreInterface
+interface DriverInterface
 {
   
   public function getName();
