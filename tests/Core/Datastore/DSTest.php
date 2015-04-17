@@ -1,87 +1,79 @@
 <?php
 
-use Carbon\Carbon;
-use App\Core\Datastore\Entity;
+namespace App\Models { class Food extends \App\Core\Datastore\Model { } }
+
+namespace {
+  
+use App\Core\Datastore\DS;
 
 class DSTest extends TestCase
 {
   
-  public function setUp()
+  public function before()
   {
-    $this->mockSchema();
-    $this->pushEntities();
-  }
-  
-  public function testPutWithCustomName()
-  {
-    $ent2 = $this->app->services['datastore']->get(['car', 'aventador'])[0];
-    
-    $this->assertEquals('car', $ent2->getKind());
-    $this->assertEquals('aventador', $ent2->getId());
-    $this->assertContains('LP 700-4', $ent2->getProperty('models'));
-    $this->assertEquals('2015-04-13 13:44:00', $ent2->getProperty('created')->format('Y-m-d H:i:s'));
-    $this->assertEquals('active', $ent2->getProperty('status'));
-  }
-  
-  public function testPutWithAutoId()
-  {
-    $ent = new Entity($this->app->services['datastore_schema'], 'car');
-    $ent->setProperties([
-      'name'      => 'Q50',
-      'created'   => Carbon::parse('2015-04-14 16:04:22')
-    ]);
-    
-    $this->app->services['datastore']->put($ent);
-    $this->assertNotNull($ent->getId());
-    sleep(5); // wait for the entity to get dispersed
-    $this->app->services['datastore']->delete([['car', $ent->getId()]]); // Cleanup
-  }
-  
-  public function tearDown()
-  {
-    $this->app->services['datastore']->delete([['car', 'aventador']]);
-  }
-  
-  protected function mockSchema()
-  {
-    $field_type_map = [
-      ['car', 'name', 'string'],
-      ['car', 'models', 'list'],
-      ['car', 'created', 'datetime'],
-      ['car', 'status', 'string']
-    ];
-    $index_map = [
-      ['car', 'name', false],
-      ['car', 'models', false],
-      ['car', 'created', false],
-      ['car', 'status', true]
-    ];
-    
-    $schema = $this->getMockBuilder('App\Core\Datastore\Schema')
+    $driver = $this->getMockBuilder('App\Core\Datastore\GCD')
                    ->disableOriginalConstructor()
                    ->getMock();
-    $schema->method('getFieldType')
-           ->will($this->returnValueMap($field_type_map));
-    $schema->method('isFieldIndexed')
-           ->will($this->returnValueMap($index_map));
+    $find_map = [
+      [
+        'SELECT * FROM food WHERE id = :id',
+        [':id' => 'chicken-bbq'],
+        [[
+          'id' => 'chicken-bbq',
+          'ingredients' => '["Chicken","Charcoal","Grill"]',
+          'name' => 'Chicken Barbeque',
+          'created' => '2015-04-15 15:22:23'
+        ]]
+      ],
+      [
+        'SELECT * FROM food WHERE edible = :edible',
+        [':edible' => true],
+        [
+          [
+            'id' => 'kare-kare',
+            'name' => 'Kare-kare'
+          ],
+          [
+            'id' => 'lechon',
+            'name' => 'Lechon'
+          ]
+        ]
+      ]
+    ];
+    $driver->method('find')
+           ->will($this->returnValueMap($find_map));
     
-    $this->app->services['datastore_schema'] = $schema;
+    $driver->method('create')
+           ->will($this->returnValueMap([['food', ['type' => 'lechon'], ['id' => 223, 'type' => 'lechon']]]));
+    
+    $this->ds = new DS($driver);
   }
   
-  protected function pushEntities()
+  public function testFindById()
   {
-    
-    // Car with custom name
-    $ent = new Entity($this->app->services['datastore_schema'], ['car', 'aventador']);
-    $ent->setProperties([
-      'name'   => 'Aventador',
-      'models' => ['LP 700-4', 'LP 700-4 Roadster', 'LP 750-4 Superveloce'],
-      'created' => Carbon::parse('April 13, 2015 13:44:00'),
-      'status'  => 'active'
-    ]);
-    
-    $this->app->services['datastore']->put($ent);
-    
+    $r = $this->ds->find('food', 'chicken-bbq');
+    $this->assertInstanceOf('\App\Models\Food', $r);
+  }
+  
+  public function testFindMany()
+  {
+    $r = $this->ds->find('food')->where('edible', true)->get();
+    $this->assertContainsOnlyInstancesOf('App\Models\Food', $r);
+  }
+  
+  public function testCreate()
+  {
+    $r = $this->ds->create('food', ['name' => 'bulad']);
+    $this->assertInstanceOf('\App\Models\Food', $r);
+  }
+  
+  public function testPut()
+  {
+    $r = $this->ds->put($this->ds->create('food', ['name' => 'lechon']));
+    $this->assertInstanceOf('App\Models\Food', $r);
+    $this->assertEquals(223, $r['id']);
   }
   
 }
+
+} // end global namespace

@@ -1,20 +1,15 @@
 <?php namespace App\Core\Datastore;
 
 use Exception;
+use ReflectionClass;
 use App\Core\Datastore\Schema;
-use Google_Client;
-use Google_Service_Datastore as Datastore;
-use Google_Service_Datastore_Key as Key;
-use Google_Service_Datastore_Mutation as Mutation;
-use Google_Service_Datastore_CommitRequest as CommitRequest;
-use Google_Service_Datastore_LookupRequest as LookupRequest;
+use App\Core\Datastore\Query;
+use Doctrine\Common\Inflector\Inflector;
 
 /**
  * Datastore Class
  *
- * Main class for interfacing with the Google Cloud Datastore. This class
- * is responsible for persisting, retrieving and removing entities
- * in the Google Cloud Datastore.
+ * This class is responsible for creating and managing active record objects.
  *
  * @package Silver
  * @author Brux
@@ -23,11 +18,11 @@ class DS
 {
   
   /**
-   * Datastore dataset instance used for querying.
+   * The driver we are currently using
    *
-   * @var object
+   * @var Driver
    */
-  protected $dataset;
+  protected $driver;
   
   /**
    * Reference to the schema reader.
@@ -39,129 +34,158 @@ class DS
   /**
    * Constructor. Setups a datastore connection.
    *
-   * @param Google_Client $client google client instance
-   * @param string $dataset_id  
+   * @param object $driver the database driver
+   * @param Schema $schema optional schema for this database
    */
-  public function __construct(Schema $schema, Google_Client $client, $dataset_id)
+  public function __construct($driver, Schema $schema = null)
   {
-    $this->connect($client);
-    $this->dataset_id = $dataset_id;
+    $this->driver = $driver;
     $this->schema = $schema;
   }
   
   /**
-   * Fetches entities from the Datastore that match the provided $key.
+   * Returns a reference to the schema we are using.
    *
-   * @param string|array $key input key
-   * @return array
+   * @return Schema
    */
-  public function get($key)
+  public function getSchema()
   {
-    $temp = new Entity($this->schema, $key);
-    $resp = $this->lookup($temp->getWrappedObject()->getKey());
-    $entities = [];
-    foreach ( $resp->getFound() as $i )
-    {
-      $i = $i->getEntity();
-      $entities[] = new Entity($this->schema, $i);
-    }
-    return $entities;
+    return $this->schema;
   }
   
   /**
-   * Creates or updates existing entities in the Datastore.
+   * Creates a new Active Record object for the provided $kind.
    *
-   * @param Entity $entity input entity
-   * @return Entity
+   * @param string $kind kind of object
+   * @param array $properties optional. initial object properties
+   * @return App\Core\Datastore\Model
    */
-  public function put(Entity $entity)
+  public function create($kind, array $properties = [])
   {
-    $mutation = new Mutation();
-    $e = $entity->getWrappedObject();
-    if ( $entity->getId() === null )
+    // If it is not a fully qualified name of a class, make it one
+    if ( strpos($kind, '\\') === false )
     {
-      $mutation->setInsertAutoId([$e]);
+      $kind = sprintf('App\Models\%s', Inflector::classify($kind));
+    }
+    return new $kind($properties, $this);
+  }
+  
+  /**
+   * Returns an AR object with $kind or if provided with an ID,
+   * a single one that has that ID.
+   *
+   * @param string $kind kind of object
+   * @param int|string $id entity ID or name
+   * @return App\Core\Datastore\Model
+   */
+  public function find($kind, $id = null)
+  {
+    if ( $id === null )
+    {
+      return new Query($kind, $this);
     }
     else
     {
-      $mutation->setUpsert([$e]);
-    }
-    $resp = $this->commit($mutation);
-    if ( $entity->getId() === null )
-    {
-      $key = $resp->getMutationResult()->getInsertAutoIdKeys()[0];
-      $entity->setKey($key);
-    }
-    return $entity;
-  }
-  
-  /**
-   * Requests entities that match $keys be deleted.
-   * Make sure $keys is an array of $keys and not a key array containing
-   * an entities ancestors! Doing that may delete not just your entity but
-   * it's ancestors as well.
-   *
-   * @param array $keys array of keys.
-   * @return void
-   */
-  public function delete(array $keys)
-  {
-    $mutation = new Mutation();
-    $deletables = [];
-    foreach ( $keys as $key )
-    {
-      $t = new Entity($this->schema, $key);
-      if ( $t->getId() !== null )
+      $q = new Query($kind, $this);
+      $res = $q->where('id', $id)->get();
+      if ( ! empty($res) ) 
       {
-        $deletables[] = $t->getWrappedObject()->getKey();
+        return $res[0];
       }
       else
       {
-        throw new Exception(sprintf('Cannot delete entity "%s" without ID or name.', $t->getKind()));
+        return null;
       }
     }
-    $mutation->setDelete($deletables);
-    $x = $this->commit($mutation);
   }
   
   /**
-   * Fetches the dataset we need for querying.
+   * Queries the database using $query with the provided $params.
    *
+   * @param string $query SQL query
+   * @param array $params array of params
+   * @return array
+   */
+  public function query($query, array $params = [])
+  {
+    if ( $query instanceof Query )
+    {
+      $params= $query->getParams();
+      $query = $query->getQuery();
+    }
+    
+    $res = [];
+    $items = $this->driver->find($query, $params);
+    
+    if ( count($items) > 0 )
+    {
+      // If the class doesn't exist, use Model
+      $class = 'App\\Models\\' . Inflector::classify($this->findKindFromQuery($query));
+      if ( ! class_exists($class) )
+      {
+        $class = 'App\Core\Datastore\Model';
+      }
+      
+      // Build the objects
+      foreach ( $items as $item )
+      {
+        $res[] = new $this->create($item, $this);
+      }
+    }
+    return $res;
+  }
+  
+  /**
+   * Persists objects to the database.
+   *
+   * @param App\Core\Datastore\Model $items item to be saved
+   * @return App\Core\Datastore\Model
+   */
+  public function put($item)
+  {
+    $class = new ReflectionClass($item);
+    $kind = Inflector::tableize($class->getShortName());
+    $props = $item->getProperties();
+    if ( isset($props['id']) )
+    {
+      $this->driver->update($kind, $props);
+    }
+    else
+    {
+      $props = $this->driver->create($kind, $props);
+      $item->id = $props['id'];
+    }
+    return $item;
+  }
+  
+  /**
+   * Removes objects from the database.
+   *
+   * @param App\Core\Datastore\Model $item item to be deleted
    * @return void
    */
-  protected function connect($client)
+  public function delete($item)
   {
-    $service = new Datastore($client);
-    $this->dataset = $service->datasets;
+    $class = new ReflectionClass($item);
+    $kind = Inflector::tablize($class->getShortName());
+    $this->driver->delete($kind, $item->id);
   }
   
   /**
-   * Sends a commit request with the provided mutation to the Datastore.
+   * undocumented function
    *
-   * @param Google_Service_Datastore_Mutation $mutation mutation
-   * @param array $opts optional commit options
-   * @return Google_Service_Datastore_CommitResponse
+   * @return string
    */
-  protected function commit(Mutation $mutation, $opts = [])
+  protected function findKindFromQuery($query)
   {
-    $req = new CommitRequest();
-    $req->setMode('NON_TRANSACTIONAL');
-    $req->setMutation($mutation);
-    return $this->dataset->commit($this->dataset_id, $req, $opts);
-  }
-  
-  /**
-   * Sends a lookup request using the provided key.
-   *
-   * @param Google_Service_Datastore_Key $key the key used for lookup
-   * @param array $opts optional request options
-   * @return 
-   */
-  protected function lookup(Key $key, $opts = [])
-  {
-    $req = new LookupRequest();
-    $req->setKeys([$key]);
-    return $this->dataset->lookup($this->dataset_id, $req, $opts);
+    if ( preg_match('/FROM\s(.+?)\s/i', $query, $matches) )
+    {
+      return Inflector::singularize($matches[1]);
+    }
+    else
+    {
+      throw new Exception(sprintf('Failed to find entity kind from query "%s".', $query));
+    }
   }
   
 }
