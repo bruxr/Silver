@@ -306,8 +306,21 @@ class Query
     }
     $this->where .= $where;
     
-    $this->where .= sprintf('%s %s ?', $field, $op);
-    $this->params[] = $value;
+    $param_name = $this->generateParamName($field);
+    $this->where .= sprintf('%s %s %s', $field, $op, $param_name);
+    $this->params[$param_name] = $value;
+  }
+  
+  protected function generateParamName($name)
+  {
+    $new_name = sprintf(':%s', $name);
+    $i = 2;
+    while ( isset($this->params[$new_name]) )
+    {
+      $new_name = sprintf(':%s%i', $name, $i);
+      $i++;
+    }
+    return $new_name;
   }
   
 }

@@ -32,37 +32,38 @@ class QueryTest extends TestCase
   public function testSimpleWhere()
   {
     $this->q->where('id', 25512);
-    $this->assertEquals('SELECT * FROM food WHERE id = ?', $this->q->getQuery());
-    $this->assertEquals([25512], $this->q->getParams());
+    $this->assertEquals('SELECT * FROM food WHERE id = :id', $this->q->getQuery());
+    $this->assertEquals([':id' => 25512], $this->q->getParams());
   }
   
   public function testSimpleWhereWithCustomOp()
   {
     $this->q->where('height', '>=', 6.0);
-    $this->assertEquals('SELECT * FROM food WHERE height >= ?', $this->q->getQuery());
-    $this->assertEquals([6.0], $this->q->getParams());
+    $this->assertEquals('SELECT * FROM food WHERE height >= :height', $this->q->getQuery());
+    $this->assertEquals([':height' => 6.0], $this->q->getParams());
   }
   
   public function testCompoundAndWhere()
   {
     $this->q->where('delicious', true)->andWhere('rating', '>', 3.0);
-    $this->assertEquals('SELECT * FROM food WHERE delicious = ? AND rating > ?', $this->q->getQuery());
-    $this->assertEquals([true, 3.0], $this->q->getParams());
+    $this->assertEquals('SELECT * FROM food WHERE delicious = :delicious AND rating > :rating', $this->q->getQuery());
+    $this->assertEquals([':delicious' => true, ':rating' => 3.0], $this->q->getParams());
   }
   
   public function testCompoundOrWhere()
   {
     $this->q->where('fried', true)->orWhere('soup', true);
-    $this->assertEquals('SELECT * FROM food WHERE fried = ? OR soup = ?', $this->q->getQuery());
-    $this->assertEquals([true, true], $this->q->getParams());
+    $this->assertEquals('SELECT * FROM food WHERE fried = :fried OR soup = :soup', $this->q->getQuery());
+    $this->assertEquals([':fried' => true, ':soup' => true], $this->q->getParams());
   }
   
   public function testCustomWhere()
   {
     $d = new DateTime();
-    $this->q->where('slug = ? AND created > ?', ['the-post', $d]);
-    $this->assertEquals('SELECT * FROM food WHERE slug = ? AND created > ?', $this->q->getQuery());
-    $this->assertEquals(['the-post', $d], $this->q->getParams());
+    $params = ['slug' => 'the-post', 'created' => $d];
+    $this->q->where('slug = :slug AND created > :created', $params);
+    $this->assertEquals('SELECT * FROM food WHERE slug = :slug AND created > :created', $this->q->getQuery());
+    $this->assertEquals($params, $this->q->getParams());
   }
   
   public function testGroupBy()
