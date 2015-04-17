@@ -251,7 +251,7 @@ class Query
     {
       throw new Exception('No datastore to use!');
     }
-    return $this->ds->query($this->getQuery(), $this->getParams());
+    return $this->ds->query($this);
   }
   
   /**
