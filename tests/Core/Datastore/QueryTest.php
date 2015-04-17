@@ -7,10 +7,7 @@ class QueryTest extends TestCase
   
   public function setUp()
   {
-    $this->ds = $this->getMockBuilder('App\Core\Datastore\DS')
-                     ->disableOriginalConstructor()
-                     ->getMock();
-    $this->q = new Query($this->ds, 'food');
+    $this->q = new Query('food');
   }
   
   public function testInstantiable()

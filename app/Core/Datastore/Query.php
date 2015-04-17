@@ -1,5 +1,7 @@
 <?php namespace App\Core\Datastore;
 
+use Exception;
+
 /**
  * Datastore Query Class
  *
@@ -86,11 +88,11 @@ class Query
   /**
    * Constructor
    *
-   * @param DS $ds reference to the datastore this query will be run to
    * @param string $kind kind of entity this query will be using
+   * @param DS $ds optional. reference to the datastore this query will be run to
    * @author Brux
    */
-  function __construct(DS $ds, $kind)
+  function __construct($kind, $ds = null)
   {
     $this->ds = $ds;
     $this->kind = $kind;
@@ -245,6 +247,10 @@ class Query
    */
   public function get()
   {
+    if ( $this->ds === null )
+    {
+      throw new Exception('No datastore to use!');
+    }
     return $this->ds->query($this->getQuery(), $this->getParams());
   }
   
