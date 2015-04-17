@@ -115,7 +115,7 @@ class Query
    * where('name', 'John') -> WHERE name = 'John'
    *
    * 2. Custom comparison
-   * where('height', '>', 500) -> height > 500
+   * where('height', '>', 500) -> WHERE height > 500
    *
    * 3. Custom query
    * where('name = ? AND height > 200', ['Tony']);
