@@ -9,12 +9,14 @@ use Doctrine\Common\Inflector\Inflector;
 /**
  * Datastore Class
  *
- * This class is responsible for creating and managing active record objects.
+ * The datastore is responsible for managing the in-memory entities, querying
+ * and persisting changes to the database (through drivers) and creating
+ * repositories for easily acquiring the entities the app needs.
  *
  * @package Silver
  * @author Brux
  */
-class DS
+class Datastore
 {
   
   /**
@@ -30,6 +32,20 @@ class DS
    * @var Schema
    */
   protected $schema;
+  
+  /**
+   * undocumented class variable
+   *
+   * @var string
+   */
+  protected $repositories = [];
+  
+  /**
+   * Contains all of the AR objects we manage.
+   *
+   * @var array
+   */
+  protected $objects = [];
   
   /**
    * Constructor. Setups a datastore connection.
@@ -51,6 +67,21 @@ class DS
   public function getSchema()
   {
     return $this->schema;
+  }
+  
+  /**
+   * Returns an entity repository.
+   *
+   * @param string $kind entity kind
+   * @return App\Core\Datastore\Repository
+   */
+  protected function getRepository($kind)
+  {
+    if ( ! isset($this->repositories[$kind]) )
+    {
+      $this->repositories[$kind] = new Repository($kind, $this);
+    }
+    return $this->repositories[$kind];
   }
   
   /**
@@ -82,7 +113,7 @@ class DS
    * a single one that has that ID.
    *
    * @param string $kind kind of object
-   * @param int|string $id entity ID or name
+   * @param int|string $id optional entity ID or name
    * @return App\Core\Datastore\Model
    */
   public function find($kind, $id = null)
@@ -124,18 +155,9 @@ class DS
     $res = [];
     $items = $this->driver->find($query, $params);
     
-    if ( count($items) > 0 )
-    {
-      // Extract the kind from the query
-      $kind = $this->findKindFromQuery($query);
-      
-      // Build the objects
-      foreach ( $items as $item )
-      {
-        $res[] = $this->create($kind, $item);
-      }
-    }
-    return $res;
+    $kind = $this->findKindFromQuery($query);
+    return $this->buildObjects($kind, $items);
+    
   }
   
   /**
@@ -155,6 +177,12 @@ class DS
     else
     {
       $new_props = $this->driver->create($kind, $props);
+      
+      // Put the object into our identity map if it's a new object.
+      if ( isset($new_props['id']) )
+      {
+        $this->objects[$kind .'_'. $new_props['id']] = $item;
+      }
     }
     $item->hydrate($new_props);
     return $item;
@@ -170,6 +198,42 @@ class DS
   {
     $kind = $this->getKindFromObject($obj);
     $this->driver->delete($kind, $item->id);
+  }
+  
+  /**
+   * Builds active record objects from an array of results from the database.
+   *
+   * @param string $kind the kind of object to build
+   * @param array $items array of rows/entities from the database.
+   * @return array
+   */
+  protected function buildObjects($kind, array $items)
+  {
+    $results = [];
+    foreach ( $items as $item )
+    {
+      // If we have an item ID, check if we already queried for that object earlier.
+      if ( isset($item['id']) )
+      {
+        $key = $kind .'_'. $item['id'];
+        if ( isset($this->objects[$key]) )
+        {
+          $obj = $this->objects[$key];
+        }
+        else
+        {
+          $obj = $this->create($kind, $item);
+          $this->objects[$key] = $obj;
+        }
+      }
+      // Otherwise just create the object.
+      else
+      {
+        $obj = $this->create($kind, $item);
+      }
+      $results[] = $obj;
+    }
+    return $results;
   }
   
   /**

@@ -4,7 +4,7 @@ namespace App\Models { class Food extends \App\Core\Datastore\Model { } }
 
 namespace {
   
-use App\Core\Datastore\DS;
+use App\Core\Datastore\Datastore;
 
 class DSTest extends TestCase
 {
@@ -48,7 +48,7 @@ class DSTest extends TestCase
              ['food', ['name' => 'lechon'], ['id' => 223, 'type' => 'lechon']]
             ]));
     
-    $this->ds = new DS($driver);
+    $this->ds = new Datastore($driver);
   }
   
   public function testFindById()
