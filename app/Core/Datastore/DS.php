@@ -126,7 +126,7 @@ class DS
     
     if ( count($items) > 0 )
     {
-      // If the class doesn't exist, use Model
+      // Extract the kind from the query
       $kind = $this->findKindFromQuery($query);
       
       // Build the objects

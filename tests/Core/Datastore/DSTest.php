@@ -55,6 +55,8 @@ class DSTest extends TestCase
   {
     $r = $this->ds->find('food', 'chicken-bbq');
     $this->assertInstanceOf('\App\Models\Food', $r);
+    $r2 = $this->ds->find('food', 'chicken-bbq');
+    $this->assertSame($r, $r2);
   }
   
   public function testFindMany()
