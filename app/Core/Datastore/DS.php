@@ -65,9 +65,16 @@ class DS
     // If it is not a fully qualified name of a class, make it one
     if ( strpos($kind, '\\') === false )
     {
-      $kind = sprintf('App\Models\%s', Inflector::classify($kind));
+      $class = sprintf('App\Models\%s', Inflector::classify($kind));
     }
-    return new $kind($properties, $this);
+    
+    // Use a generic model class if the class doesn't exist
+    if ( ! class_exists($class) )
+    {
+      $class = 'Model';
+    }
+    
+    return new $class($properties, $this);
   }
   
   /**
@@ -120,16 +127,12 @@ class DS
     if ( count($items) > 0 )
     {
       // If the class doesn't exist, use Model
-      $class = 'App\\Models\\' . Inflector::classify($this->findKindFromQuery($query));
-      if ( ! class_exists($class) )
-      {
-        $class = 'App\Core\Datastore\Model';
-      }
+      $kind = $this->findKindFromQuery($query);
       
       // Build the objects
       foreach ( $items as $item )
       {
-        $res[] = new $this->create($item, $this);
+        $res[] = $this->create($kind, $item);
       }
     }
     return $res;
@@ -141,20 +144,19 @@ class DS
    * @param App\Core\Datastore\Model $items item to be saved
    * @return App\Core\Datastore\Model
    */
-  public function put($item)
+  public function put(Model $item)
   {
-    $class = new ReflectionClass($item);
-    $kind = Inflector::tableize($class->getShortName());
+    $kind = $this->getKindFromObject($item);
     $props = $item->getProperties();
     if ( isset($props['id']) )
     {
-      $this->driver->update($kind, $props);
+      $new_props = $this->driver->update($kind, $props);
     }
     else
     {
-      $props = $this->driver->create($kind, $props);
-      $item->id = $props['id'];
+      $new_props = $this->driver->create($kind, $props);
     }
+    $item->hydrate($new_props);
     return $item;
   }
   
@@ -164,11 +166,22 @@ class DS
    * @param App\Core\Datastore\Model $item item to be deleted
    * @return void
    */
-  public function delete($item)
+  public function delete(Model $item)
   {
-    $class = new ReflectionClass($item);
-    $kind = Inflector::tablize($class->getShortName());
+    $kind = $this->getKindFromObject($obj);
     $this->driver->delete($kind, $item->id);
+  }
+  
+  /**
+   * undocumented function
+   *
+   * @return void
+   * @author Brux
+   */
+  protected function getKindFromObject($obj)
+  {
+    $reflect = new ReflectionClass($obj);
+    return Inflector::tableize($reflect->getShortName());
   }
   
   /**

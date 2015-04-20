@@ -44,7 +44,9 @@ class DSTest extends TestCase
            ->will($this->returnValueMap($find_map));
     
     $driver->method('create')
-           ->will($this->returnValueMap([['food', ['type' => 'lechon'], ['id' => 223, 'type' => 'lechon']]]));
+           ->will($this->returnValueMap([
+             ['food', ['name' => 'lechon'], ['id' => 223, 'type' => 'lechon']]
+            ]));
     
     $this->ds = new DS($driver);
   }
@@ -71,7 +73,7 @@ class DSTest extends TestCase
   {
     $r = $this->ds->put($this->ds->create('food', ['name' => 'lechon']));
     $this->assertInstanceOf('App\Models\Food', $r);
-    $this->assertEquals(223, $r['id']);
+    $this->assertEquals(223, $r->id);
   }
   
 }
