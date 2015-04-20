@@ -69,6 +69,11 @@ class SqliteDriver implements DriverInterface
     $stmt->execute($props);
   }
   
+  public function delete($kind, $id)
+  {
+      throw new NotImplementedException();
+  }
+  
   protected function prepProperties($props)
   {
     foreach ( $props as $key => $val )
