@@ -51,6 +51,7 @@ class DSTest extends TestCase
     $this->ds = new Datastore($driver);
   }
   
+  /*
   public function testFindById()
   {
     $r = $this->ds->find('food', 'chicken-bbq');
@@ -77,6 +78,7 @@ class DSTest extends TestCase
     $this->assertInstanceOf('App\Models\Food', $r);
     $this->assertEquals(223, $r->id);
   }
+  */
   
 }
 
