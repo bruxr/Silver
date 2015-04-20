@@ -1,46 +1,43 @@
 <?php
+  
+// Google auth scopes
+$app->container->set('google_auth_scopes', function() {
+    return [
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/datastore'
+    ];
+});
 
-return function($box)
-{
-  
-  // Google auth scopes
-  $box['google_auth_scopes'] = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/datastore'
-  ];
-  
-  // Google_Auth_AssertionCredentials
-  $box['google_auth_assertioncredentials'] = function($b) {
+// Google_Auth_AssertionCredentials
+$app->container->singleton('google_auth_assertioncredentials', function($c) {
     $key = CONFIG . '/silver-key.p12';
-    return new Google_Auth_AssertionCredentials(getenv('APP_SERVICE_ACCT'), $b['google_auth_scopes'], file_get_contents($key));
-  };
-  
-  // Google_Client
-  $box['google_client'] = function($b) {
+    return new Google_Auth_AssertionCredentials(getenv('APP_SERVICE_ACCT'), $c['google_auth_scopes'], file_get_contents($key));
+});
+
+// Google_Client
+$app->container->singleton('google_client', function($c) {
     $gc = new Google_Client();
     $gc->setApplicationName(getenv('APP_ID'));
-    $gc->setAssertionCredentials($b['google_auth_assertioncredentials']);
+    $gc->setAssertionCredentials($c['google_auth_assertioncredentials']);
     return $gc;
-  };
-  
-  // Yaml Parser
-  $box['yaml_parser'] = function($b) {
+});
+
+// Yaml Parser
+$app->container->singleton('yaml_parser', function() {
     return new Symfony\Component\Yaml\Parser();
-  };
-  
-  // Datastore Schema
-  $box['datastore_schema'] = function($b) {
-    return new App\Core\Datastore\Schema($b['yaml_parser'], CONFIG . '/schema.yml');
-  };
-  
-  // GCD
-  $box['gcd'] = function($b) {
-    return new App\Core\Datastore\GCD(getenv('APP_ID'), $b['google_client'], $b['datastore_schema']);
-  };
-  
-  // DS
-  $box['datastore'] = function($b) {
-    return new App\Core\Datastore\DS($b['datastore_schema'], $b['google_client'], getenv('APP_ID'));
-  };
-  
-};
+});
+
+// Datastore Schema
+$app->container->singleton('datastore_schema', function($c) {
+    return new App\Core\Datastore\Schema($c['yaml_parser'], CONFIG . '/schema.yml');
+});
+
+// GCD
+$app->container->singleton('db_driver', function($c) {
+    return new App\Core\Datastore\GCD(getenv('APP_ID'), $c['google_client'], $c['datastore_schema']);
+});
+
+// DS
+$app->container->singleton('datastore', function($c) {
+    return new App\Core\Datastore\Datastore($c['datastore_schema'], $c['google_client'], getenv('APP_ID'));
+});
