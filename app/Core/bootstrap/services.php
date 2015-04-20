@@ -39,5 +39,5 @@ $app->container->singleton('db_driver', function($c) {
 
 // DS
 $app->container->singleton('datastore', function($c) {
-    return new App\Core\Datastore\Datastore($c['datastore_schema'], $c['google_client'], getenv('APP_ID'));
+    return new App\Core\Datastore\Datastore($c['db_driver']);
 });
