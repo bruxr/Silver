@@ -2,7 +2,7 @@
 	"name": "brux/Silver",
 	"description": "Davao's moves in one place.",
 	"require": {
-        "slim/slim": "2.*",
+        "slim/slim": "~2.*",
         "electrolinux/phpquery": "dev-master",
         "monolog/monolog": "~1.13",
         "symfony/yaml": "~2.6",
@@ -10,7 +10,6 @@
         "google/apiclient": "dev-master",
 		"guzzlehttp/guzzle": "~5.2",
 		"vlucas/phpdotenv": "~1.1",
-		"pimple/pimple": "~3.0",
 		"doctrine/inflector": "~1.0"
 	},
 	"require-dev": {
