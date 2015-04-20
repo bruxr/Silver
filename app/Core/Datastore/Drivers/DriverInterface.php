@@ -1,4 +1,4 @@
-<?php namespace App\Core\Datastore;
+<?php namespace App\Core\Datastore\Drivers;
 
 interface DriverInterface
 {
