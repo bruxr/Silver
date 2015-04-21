@@ -1,0 +1,19 @@
+palitaw:
+  name: Palitaw
+  ingredients:
+    - Rice Flour
+    - Shredded Coconut
+    - Sesame Seeds
+    - Sugar
+  edible: true
+  
+kalamay:
+  name: Kalamay
+  ingredients:
+    - Glutinous Rice
+    - Coconut Milk
+    - Coconut Cream
+    - Palm Sugar
+    - Anise Seed
+    - Vegetable Oil
+  edible: true
