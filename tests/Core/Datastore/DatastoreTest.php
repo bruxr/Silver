@@ -4,30 +4,31 @@ namespace App\Models { class Food extends \App\Core\Datastore\Model { } }
 
 namespace {
   
+use Carbon\Carbon;
 use App\Core\Datastore\Datastore;
 
-class DSTest extends TestCase
+class DatastoreTest extends TestCase
 {
   
   public function before()
   {
-    $driver = $this->getMockBuilder('App\Core\Datastore\GCD')
+    $driver = $this->getMockBuilder('App\Core\Datastore\Drivers\GCD')
                    ->disableOriginalConstructor()
                    ->getMock();
     $find_map = [
       [
-        'SELECT * FROM food WHERE id = :id',
+        'SELECT * FROM food WHERE id = :id LIMIT 1',
         [':id' => 'chicken-bbq'],
         [[
           'id' => 'chicken-bbq',
-          'ingredients' => '["Chicken","Charcoal","Grill"]',
           'name' => 'Chicken Barbeque',
-          'created' => '2015-04-15 15:22:23'
+          'ingredients' => ['Chicken', 'Charcoal', 'Grill'],
+          'created' => Carbon::parse('2015-04-15T15:22:23-00:00')
         ]]
       ],
       [
-        'SELECT * FROM food WHERE edible = :edible',
-        [':edible' => true],
+        'SELECT * FROM food',
+        [],
         [
           [
             'id' => 'kare-kare',
@@ -45,24 +46,23 @@ class DSTest extends TestCase
     
     $driver->method('create')
            ->will($this->returnValueMap([
-             ['food', ['name' => 'lechon'], ['id' => 223, 'type' => 'lechon']]
+             ['food', ['name' => 'Lechon'], ['id' => 223, 'type' => 'Lechon']]
             ]));
     
     $this->ds = new Datastore($driver);
   }
-  
-  /*
-  public function testFindById()
+
+  public function testFind()
   {
     $r = $this->ds->find('food', 'chicken-bbq');
     $this->assertInstanceOf('\App\Models\Food', $r);
     $r2 = $this->ds->find('food', 'chicken-bbq');
     $this->assertSame($r, $r2);
   }
-  
+
   public function testFindMany()
   {
-    $r = $this->ds->find('food')->where('edible', true)->get();
+    $r = $this->ds->findAll('food');
     $this->assertContainsOnlyInstancesOf('App\Models\Food', $r);
   }
   
@@ -74,11 +74,11 @@ class DSTest extends TestCase
   
   public function testPut()
   {
-    $r = $this->ds->put($this->ds->create('food', ['name' => 'lechon']));
-    $this->assertInstanceOf('App\Models\Food', $r);
-    $this->assertEquals(223, $r->id);
+    $lechon = $this->ds->create('food', ['name' => 'Lechon']);
+    $this->ds->put($lechon);
+    $lechon2 = $this->ds->find('food', 223);
+    $this->assertSame($lechon, $lechon2);
   }
-  */
   
 }
 
