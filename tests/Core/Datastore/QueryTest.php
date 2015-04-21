@@ -22,7 +22,7 @@ class QueryTest extends TestCase
   
   public function testSelectCustom()
   {
-    $this->q->select('id', 'name', 'ingredients');
+    $this->q->select('name', 'ingredients');
     $this->assertEquals('SELECT id, name, ingredients FROM food', $this->q->getQuery());
   }
   

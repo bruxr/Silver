@@ -106,7 +106,12 @@ class Query
    */
   public function select()
   {
-    $this->select = func_get_args();
+    $fields = func_get_args();
+    if ( ! in_array('id', $fields) )
+    {
+      array_unshift($fields, 'id');
+    }
+    $this->select = $fields;
   }
   
   /**
