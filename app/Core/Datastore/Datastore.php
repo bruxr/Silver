@@ -174,7 +174,7 @@ class Datastore
     {
         $kind = $entity->getKind();
         $props = $entity->getProperties();
-        if ( isset($entity->id) )
+        if ( isset($props['id']) )
         {
             $new_props = $this->driver->update($kind, $props);
             $new_entity = false;
