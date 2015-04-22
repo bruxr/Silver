@@ -1,6 +1,7 @@
 <?php namespace App\Core\Datastore;
 
 use ReflectionClass;
+use Carbon\Carbon;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
@@ -14,7 +15,7 @@ use Doctrine\Common\Inflector\Inflector;
  * @author Brux
  * @since 0.1.0
  */
-abstract class Model// implements ArrayAccess, JsonSerializable
+abstract class Model implements \JsonSerializable
 {  
   
   /**
@@ -279,6 +280,28 @@ abstract class Model// implements ArrayAccess, JsonSerializable
     $conditions[$foreign_key] = $this->get('id');
 
     return $datastore->findCustom($kind, $conditions);
+  }
+
+  /**
+   * Allows entities to be easily encoded to JSON using json_encode().
+   * 
+   * Take note that this will return dirty and original properties.
+   * Make sure to refresh() before encoding if you only want
+   * properties that were persisted to the database.
+   * 
+   * @return array
+   */
+  public function jsonSerialize()
+  {
+    $props = $this->getProperties();
+    foreach ( $props as $field => $value )
+    {
+      if ( $value instanceof Carbon )
+      {
+        $props[$field] = $value->toIso8601String();
+      }
+    }
+    return $props;
   }
   
   /**

@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 class Person extends App\Core\Datastore\Model
 {
     public function getCars()
@@ -104,6 +106,16 @@ class ModelTest extends TestCase
         $guy->id = 22;
         $guy->name = 'John Doe';
         $this->assertContainsOnly('Car', $guy->getCars());
+    }
+
+    public function testJsonEncode()
+    {
+        $car = new Car();
+        $car->name = 'Skyline';
+        $car->price = 3000000;
+        $car->purchased = Carbon::parse('2015-04-22');
+        $json = json_encode($car);
+        $this->assertEquals('{"name":"Skyline","price":3000000,"purchased":"2015-04-22T00:00:00+0800"}', $json);
     }
 
 }
