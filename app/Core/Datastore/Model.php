@@ -255,6 +255,17 @@ abstract class Model// implements ArrayAccess, JsonSerializable
     }
   }
 
+  /**
+   * Returns the entities this entity has/owns.
+   * 
+   * @param  string $kind kind of entities this entity owns
+   * @param  array $opts optional array of options. can contain:
+   *                     - conditions: more conditions to limit results
+   *                     - foreign_key: the name of the field pointing to the
+   *                                    entity we belong to.
+   *                     - datastore: the datastore to use
+   * @return array
+   */
   public function hasMany($kind, $opts = [])
   {
     $defaults = [
