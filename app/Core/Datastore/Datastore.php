@@ -147,6 +147,37 @@ class Datastore
     }
 
     /**
+     * Builds a custom query for searching a set of entities.
+     * 
+     * @param  string $kind entity kind
+     * @param  array $conditions optional. array of conditions.
+     * @param  int $limit limit the number of results
+     * @param  int $offset start at a specific index/offset
+     * @return array
+     */
+    public function findCustom($kind, array $conditions = [], $limit = null, $offset = 0)
+    {
+        $q = new Query($kind);
+
+        if ( ! empty($conditions) )
+        {
+            $q->where($conditions);
+        }
+
+        if ( $limit !== null )
+        {
+            $q->limit($limit);
+        }
+
+        if ( $offset > 0 )
+        {
+            $q->offset($offset);
+        }
+
+        return $this->buildEntities($this->query($q));
+    }
+
+    /**
      * Queries the database using $query with the provided $params.
      * Take note that this doesn't return entities but an array of rows.
      *
