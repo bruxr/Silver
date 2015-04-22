@@ -224,6 +224,51 @@ abstract class Model// implements ArrayAccess, JsonSerializable
     }
     return $this->kind;
   }
+
+  /**
+   * Returns the entity where this entity belongs to.
+   * 
+   * @param  string $kind kind of entity this entity belongs to
+   * @param  array $opts optional array of options. can contain:
+   *                     - foreign_key: the name of the field pointing to the
+   *                                    entity we belong to.
+   *                     - datastore: the datastore to use
+   * @return App\Core\Datastore\Model
+   */
+  public function belongsTo($kind, $opts = [])
+  {
+    $defaults = [
+      'foreign_key' => Inflector::tableize($kind) . '_id',
+      'datastore' => $this->ds
+    ];
+    $opts = array_merge($defaults, $opts);
+    extract($opts);
+
+    $id = $this->get($foreign_key);
+    if ( $id === null )
+    {
+      return null;
+    }
+    else
+    {
+      return $datastore->find($kind, $id);
+    }
+  }
+
+  public function hasMany($kind, $opts = [])
+  {
+    $defaults = [
+      'conditions' => [],
+      'foreign_key' => Inflector::tableize($kind) . '_id',
+      'datastore' => $this->ds
+    ];
+    $opts = array_merge($defaults, $opts);
+    extract($opts);
+
+    $conditions[$foreign_key] = $this->get('id');
+
+    return $datastore->findCustom($kind, $conditions);
+  }
   
   /**
    * Catches retrieving of this object's properties.

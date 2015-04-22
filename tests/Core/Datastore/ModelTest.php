@@ -1,6 +1,20 @@
 <?php
 
-class Car extends App\Core\Datastore\Model { }
+class Person extends App\Core\Datastore\Model
+{
+    public function getCars()
+    {
+        return $this->hasMany('Car');
+    }
+}
+
+class Car extends App\Core\Datastore\Model
+{
+    public function getOwner()
+    {
+        return $this->belongsTo('Person', ['foreign_key' => 'owner_id']);
+    }
+}
 
 class ModelTest extends TestCase
 {
@@ -64,6 +78,32 @@ class ModelTest extends TestCase
         $this->assertTrue($car->unlocked);
         $car->refresh();
         $this->assertFalse($car->unlocked);
+    }
+
+    public function testBelongsTo()
+    {
+        $ds = $this->getMockBuilder('App\Core\Datastore\Datastore')
+                   ->disableOriginalConstructor()
+                   ->getMock();
+        $ds->method('find')
+            ->willReturn(new Person(['name' => 'John Doe']));
+        $car = new Car([], $ds);
+        $car->name = 'Focus';
+        $car->owner_id = 123;
+        $this->assertInstanceOf('Person', $car->getOwner());
+    }
+
+    public function testHasMany()
+    {
+        $ds = $this->getMockBuilder('App\Core\Datastore\Datastore')
+                   ->disableOriginalConstructor()
+                   ->getMock();
+        $ds->method('findCustom')
+           ->willReturn([new Car(['name' => 'R8']), new Car(['name' => 'M3'])]);
+        $guy = new Person([], $ds);
+        $guy->id = 22;
+        $guy->name = 'John Doe';
+        $this->assertContainsOnly('Car', $guy->getCars());
     }
 
 }
