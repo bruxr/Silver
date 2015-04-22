@@ -1,6 +1,7 @@
 <?php namespace App\Core\Datastore;
 
 use ReflectionClass;
+use App\Core\Observable;
 use Carbon\Carbon;
 use Doctrine\Common\Inflector\Inflector;
 
@@ -15,8 +16,8 @@ use Doctrine\Common\Inflector\Inflector;
  * @author Brux
  * @since 0.1.0
  */
-abstract class Model implements \JsonSerializable
-{
+abstract class Model implements \JsonSerializable {
+  use Observable;
 
   /**
    * Reference to the Datastore class
