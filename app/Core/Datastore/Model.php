@@ -16,22 +16,22 @@ use Doctrine\Common\Inflector\Inflector;
  * @since 0.1.0
  */
 abstract class Model implements \JsonSerializable
-{  
-  
+{
+
   /**
    * Reference to the Datastore class
    *
    * @var App\Core\Datastore\DS
    */
   protected $ds;
-  
+
   /**
    * The object's persisted properties.
    *
    * @var array
    */
   protected $properties = [];
-  
+
   /**
    * Contains properties that aren't persisted yet.
    *
@@ -42,11 +42,11 @@ abstract class Model implements \JsonSerializable
   /**
    * The kind of this entity. This is only filled when
    * invoking Model::getKind().
-   * 
+   *
    * @var string
    */
   protected $kind = null;
-  
+
   /**
    * Constructor
    *
@@ -60,7 +60,7 @@ abstract class Model implements \JsonSerializable
     $this->ds = $ds;
     $this->hydrate($properties);
   }
-  
+
   /**
    * Fills the object's properties without marking them as dirty.
    *
@@ -74,7 +74,7 @@ abstract class Model implements \JsonSerializable
       $this->properties[$name] = $value;
     }
   }
-  
+
   /**
    * Retrieve a property value.
    *
@@ -96,7 +96,7 @@ abstract class Model implements \JsonSerializable
       throw new \Exception(sprintf('%s has no property named %s.', get_class($this), $name));
     }
   }
-  
+
   /**
    * Sets a property value.
    *
@@ -109,7 +109,7 @@ abstract class Model implements \JsonSerializable
     $this->dirty[$name] = $value;
     return $this;
   }
-  
+
   /**
    * Returns TRUE if a property is present.
    *
@@ -127,7 +127,7 @@ abstract class Model implements \JsonSerializable
       return false;
     }
   }
-  
+
   /**
    * Returns TRUE if this is a new record.
    *
@@ -137,7 +137,7 @@ abstract class Model implements \JsonSerializable
   {
     return !isset($this->properties['id']);
   }
-  
+
   /**
    * Returns TRUE if this model has unsaved properties or if $name is
    * provided, returns TRUE if this model has an unsaved property named $name.
@@ -156,7 +156,7 @@ abstract class Model implements \JsonSerializable
       return isset($this->dirty[$name]);
     }
   }
-  
+
   /**
    * Returns an array of properties that hasn't been saved yet.
    *
@@ -166,7 +166,7 @@ abstract class Model implements \JsonSerializable
   {
     return $this->dirty;
   }
-  
+
   /**
    * Returns the properties as an array.
    *
@@ -177,7 +177,7 @@ abstract class Model implements \JsonSerializable
     $props = array_merge($this->properties, $this->dirty);
     return $props;
   }
-  
+
   /**
    * Saves the model to the datastore.
    *
@@ -203,7 +203,7 @@ abstract class Model implements \JsonSerializable
 
   /**
    * Clears any unsaved properties, making the entity "clean" again.
-   * 
+   *
    * @return void
    */
   public function refresh()
@@ -213,7 +213,7 @@ abstract class Model implements \JsonSerializable
 
   /**
    * Returns the kind of this entity.
-   * 
+   *
    * @return string
    */
   public function getKind()
@@ -228,7 +228,7 @@ abstract class Model implements \JsonSerializable
 
   /**
    * Returns the entity where this entity belongs to.
-   * 
+   *
    * @param  string $kind kind of entity this entity belongs to
    * @param  array $opts optional array of options. can contain:
    *                     - foreign_key: the name of the field pointing to the
@@ -258,7 +258,7 @@ abstract class Model implements \JsonSerializable
 
   /**
    * Returns the entities this entity has/owns.
-   * 
+   *
    * @param  string $kind kind of entities this entity owns
    * @param  array $opts optional array of options. can contain:
    *                     - conditions: more conditions to limit results
@@ -284,11 +284,11 @@ abstract class Model implements \JsonSerializable
 
   /**
    * Allows entities to be easily encoded to JSON using json_encode().
-   * 
+   *
    * Take note that this will return dirty and original properties.
    * Make sure to refresh() before encoding if you only want
    * properties that were persisted to the database.
-   * 
+   *
    * @return array
    */
   public function jsonSerialize()
@@ -303,7 +303,7 @@ abstract class Model implements \JsonSerializable
     }
     return $props;
   }
-  
+
   /**
    * Catches retrieving of this object's properties.
    *
@@ -314,7 +314,7 @@ abstract class Model implements \JsonSerializable
   {
     return $this->get($name);
   }
-  
+
   /**
    * Catches setting of this object's properties.
    *
@@ -326,7 +326,7 @@ abstract class Model implements \JsonSerializable
   {
     return $this->set($name, $value);
   }
-  
+
   /**
    * Returns TRUE if a property is present.
    *
@@ -337,5 +337,5 @@ abstract class Model implements \JsonSerializable
   {
     return $this->has($name);
   }
-  
+
 }
