@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Datastore\Schema;
+
 class SchemaTest extends TestCase
 {
   
@@ -17,17 +19,21 @@ class SchemaTest extends TestCase
         'created' => 'datetime'
       ]
     ];
-    $parser = $this->getMockBuilder('Symfony\Component\Yaml\Parser')->getMock();
-    $parser->method('parse')
-           ->willReturn($schema);
     
-    $this->schema = new App\Core\Datastore\Schema($parser, ROOT . '/config/schema.yml');
+    $this->schema = new Schema();
+    $this->schema->describe('car', [
+      'slug'       => ['as' => 'string', 'indexed' => true],
+      'models'     => 'list',
+      'timestamps' => true
+    ]);
+    $this->schema->describe('person', [
+      'name'      => 'string'
+    ]);
   }
   
   public function testGetFieldType()
   {
     $this->assertEquals('datetime', $this->schema->getFieldType('car', 'updated'));
-    $this->assertEquals('datetime', $this->schema->getFieldType('car:updated'));
   }
   
   public function testGetFieldTypeWithUnknownField()
@@ -38,13 +44,11 @@ class SchemaTest extends TestCase
   public function testIsFieldIndexed()
   {
     $this->assertTrue($this->schema->isFieldIndexed('car', 'slug'));
-    $this->assertTrue($this->schema->isFieldIndexed('car:slug'));
   }
   
   public function testIsFieldIndexedOnNonIndex()
   {
     $this->assertFalse($this->schema->isFieldIndexed('car', 'models'));
-    $this->assertFalse($this->schema->isFieldIndexed('car:models'));
   }
   
   public function testIsFieldIndexedWithUnknownField()
@@ -52,13 +56,10 @@ class SchemaTest extends TestCase
     $this->assertFalse($this->schema->isFieldIndexed('car', 'missing'));
   }
   
-  public function testSetSchema()
+  public function testHasTimestamps()
   {
-    $this->schema->setSchema('supercar', ['name' => 'string', 'carbon_fiber' => ['type' => 'boolean', 'indexed' => true]]);
-    $this->assertEquals('string', $this->schema->getFieldType('supercar', 'name'));
-    $this->assertFalse($this->schema->isFieldIndexed('supercar', 'name'));
-    $this->assertEquals('boolean', $this->schema->getFieldType('supercar', 'carbon_fiber'));
-    $this->assertTrue($this->schema->isFieldIndexed('supercar', 'carbon_fiber'));
+    $this->assertTrue($this->schema->hasTimestamps('car'));
+    $this->assertFalse($this->schema->hasTimestamps('person'));
   }
   
 }

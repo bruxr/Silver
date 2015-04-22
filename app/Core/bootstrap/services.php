@@ -22,14 +22,9 @@ $app->container->singleton('google_client', function($c) {
     return $gc;
 });
 
-// Yaml Parser
-$app->container->singleton('yaml_parser', function() {
-    return new Symfony\Component\Yaml\Parser();
-});
-
 // Datastore Schema
 $app->container->singleton('datastore_schema', function($c) {
-    return new App\Core\Datastore\Schema($c['yaml_parser'], CONFIG . '/schema.yml');
+    return new App\Core\Datastore\Schema(CONFIG . '/schema.php');
 });
 
 // GCD
