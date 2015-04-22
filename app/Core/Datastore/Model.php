@@ -235,7 +235,7 @@ abstract class Model// implements ArrayAccess, JsonSerializable
    *                     - datastore: the datastore to use
    * @return App\Core\Datastore\Model
    */
-  public function belongsTo($kind, $opts = [])
+  public function belongsTo($kind, array $opts = [])
   {
     $defaults = [
       'foreign_key' => Inflector::tableize($kind) . '_id',
@@ -266,7 +266,7 @@ abstract class Model// implements ArrayAccess, JsonSerializable
    *                     - datastore: the datastore to use
    * @return array
    */
-  public function hasMany($kind, $opts = [])
+  public function hasMany($kind, array $opts = [])
   {
     $defaults = [
       'conditions' => [],
