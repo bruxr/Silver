@@ -165,7 +165,7 @@ class GCD implements DriverInterface
     if ( $auto_id )
     {
       $key = $resp->getMutationResult()->getInsertAutoIdKeys()[0];
-      $properties['id'] = (int) $key->getPath()[0]->getId();
+      $properties['id'] = $key->getPath()[0]->getId();
     }
     return $properties;
   }
@@ -371,7 +371,7 @@ class GCD implements DriverInterface
     $kpe = $entity->getKey()->getPath()[0];
     if ( $kpe->getName() === null )
     {
-      $item['id'] = (int) $kpe->getId();
+      $item['id'] = $kpe->getId();
     }
     else
     {
