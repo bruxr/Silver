@@ -60,6 +60,17 @@ abstract class Model implements \JsonSerializable {
   {
     $this->ds = $ds;
     $this->hydrate($properties);
+    $this->setup();
+  }
+
+  /**
+   * Perform any setup you need here.
+   * 
+   * @return void
+   */
+  protected function setup()
+  {
+    
   }
 
   /**
