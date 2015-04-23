@@ -1,6 +1,7 @@
 <?php namespace App\Core\Datastore\Drivers;
 
 use Exception;
+use App\Core\Datastore\Schema;
 use Carbon\Carbon;
 use Google_Client;
 use Google_Service_Datastore as Datastore;
