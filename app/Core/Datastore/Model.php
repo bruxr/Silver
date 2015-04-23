@@ -97,16 +97,17 @@ abstract class Model implements \JsonSerializable {
   {
     if ( isset($this->dirty[$name]) )
     {
-      return $this->dirty[$name];
+      $value = $this->dirty[$name];
     }
     elseif( isset($this->properties[$name]) )
     {
-      return $this->properties[$name];
+      $value = $this->properties[$name];
     }
     else
     {
       throw new \Exception(sprintf('%s has no property named %s.', get_class($this), $name));
     }
+    return $this->trigger("get_$name", $value);
   }
 
   /**
@@ -118,6 +119,7 @@ abstract class Model implements \JsonSerializable {
    */
   public function set($name, $value)
   {
+    $value = $this->trigger("set_$name", $value);
     $this->dirty[$name] = $value;
     return $this;
   }
