@@ -23,7 +23,7 @@ class GCDTest extends TestCase
     $schema->method('isFieldIndexed')
            ->will($this->returnValueMap($field_indices));
     
-    $this->gcd = new App\Core\Datastore\GCD(getenv('APP_ID'), $this->app->services['google_client'], $schema);
+    $this->gcd = new App\Core\Datastore\Drivers\GCD(getenv('APP_ID'), $this->app->container['google_client'], $schema);
   }
 
 
