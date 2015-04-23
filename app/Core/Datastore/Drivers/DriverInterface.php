@@ -9,6 +9,8 @@ interface DriverInterface
   
   public function find($type, array $params);
   
+  public function listIds($type);
+  
   public function update($type, array $properties);
   
   public function delete($type, $id);

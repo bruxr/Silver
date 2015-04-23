@@ -178,6 +178,17 @@ class Datastore
     }
 
     /**
+     * Returns an array of all entity IDs with a specific entity kind.
+     * 
+     * @param  string $kind entity kind
+     * @return array
+     */
+    public function listIds($kind)
+    {
+        return $this->driver->listIds($kind);
+    }
+
+    /**
      * Queries the database using $query with the provided $params.
      * Take note that this doesn't return entities but an array of rows.
      *

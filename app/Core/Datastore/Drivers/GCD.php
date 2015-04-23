@@ -12,6 +12,9 @@ use Google_Service_Datastore_Mutation as Mutation;
 use Google_Service_Datastore_GqlQuery as GqlQuery;
 use Google_Service_Datastore_GqlQueryArg as GqlQueryArg;
 use Google_Service_Datastore_Value as Value;
+use Google_Service_Datastore_PropertyExpression as PropertyExpression;
+use Google_Service_Datastore_PropertyReference as PropertyReference;
+use Google_Service_Datastore_Query as Query;
 use Google_Service_Datastore_CommitRequest as CommitRequest;
 use Google_Service_Datastore_LookupRequest as LookupRequest;
 use Google_Service_Datastore_RunQueryRequest as RunQueryRequest;
@@ -236,6 +239,43 @@ class GCD implements DriverInterface
     }
     
     return $res;
+  }
+
+  public function listIds($kind)
+  {
+    $ref = new PropertyReference();
+    $ref->setName('__key__');
+    $projection = new PropertyExpression();
+    $projection->setProperty($ref);
+    $q = new Query();
+    $q->setKinds([$kind]);
+    $q->setProjection($projection);
+    $req = new RunQueryRequest();
+    $req->setQuery($q);
+
+    $resp = $this->query($req);
+    $ids = [];
+    foreach ( $resp->getBatch()->getEntityResults() as $r )
+    {
+      $r = $r->getEntity()->getKey()->getPath();
+      $key = end($r);
+
+      // Skip the extra keys we don't need.
+      if ( $key->getKind() !== $kind )
+      {
+        continue;
+      }
+
+      if ( $key->getId() === null )
+      {
+        $ids[] = $key->getName();
+      }
+      else
+      {
+        $ids[] = $key->getId();
+      }
+    }
+    return $ids;
   }
   
   public function update($kind, array $properties)

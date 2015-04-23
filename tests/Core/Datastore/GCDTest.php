@@ -78,6 +78,12 @@ class GCDTest extends TestCase
   {
     $items = $this->gcd->find('SELECT * FROM food');
   }
+
+  public function testListIds()
+  {
+    $ids = $this->gcd->listIds('food');
+    $this->assertNotEmpty($ids);
+  }
   
   public function testUpdate()
   {
