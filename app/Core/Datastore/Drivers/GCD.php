@@ -3,6 +3,7 @@
 use Exception;
 use App\Core\Datastore\Schema;
 use Carbon\Carbon;
+use Doctrine\Common\Inflector\Inflector;
 use Google_Client;
 use Google_Service_Datastore as Datastore;
 use Google_Service_Datastore_Entity as Entity;
@@ -205,6 +206,13 @@ class GCD implements DriverInterface
       {
         $type = 'String';
         $value = json_encode($value);
+      }
+      // Foreign Keys
+      elseif ( $type == 'Reference' )
+      {
+        $target_kind = Inflector::tableize($this->schema->getReferencedEntity($kind, $name));
+        $type = 'Key';
+        $value = $this->buildKey([$target_kind, $value]);
       }
       elseif ( $type == '' )
       {
