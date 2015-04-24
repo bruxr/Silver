@@ -286,7 +286,7 @@ class Datastore
             $class = sprintf('App\Models\%s', Inflector::classify($kind));
         }
 
-        return new $class($props, $this);
+        return new $class($props, $this, $this->getSchema());
     }
 
     /**

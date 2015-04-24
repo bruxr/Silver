@@ -26,6 +26,13 @@ abstract class Model implements \JsonSerializable {
    */
   protected $ds;
 
+    /**
+     * Reference to the Schema manager.
+     * 
+     * @var Schema
+     */
+    protected $schema;
+
   /**
    * The object's persisted properties.
    *
@@ -48,20 +55,34 @@ abstract class Model implements \JsonSerializable {
    */
   protected $kind = null;
 
-  /**
-   * Constructor
-   *
-   * @param array $properties optional. initial properties of this object
-   * @param DS $ds optional. reference to the datastore class
-   * @param string $kind optional kind of entity. this is left out if instantiating
-   *                     from sub classes.
-   */
-  function __construct(array $properties = [], Datastore $ds = null)
-  {
-    $this->ds = $ds;
-    $this->hydrate($properties);
-    $this->setup();
-  }
+    /**
+     * Converts data types to rules understood the our validation library
+     *
+     * @var  array
+     */
+    protected static $DATA_TYPES_TO_RULES = [
+        'boolean'   => 'bool',
+        'datetime'  => 'date',
+        'double'    => 'float',
+        'entity'    => 'object',
+        'integer'   => 'int',
+        'list'      => 'arr'
+    ];
+
+    /**
+     * Constructor
+     *
+     * @param array $properties optional. initial properties of this object
+     * @param DS $ds optional. reference to the datastore class
+     * @param Schema $schema optional. schema for this entity kind
+     */
+    function __construct(array $properties = [], Datastore $ds = null, Schema $schema = null)
+    {
+        $this->ds = $ds;
+        $this->schema = $schema;
+        $this->hydrate($properties);
+        $this->setup();
+    }
 
   /**
    * Perform any setup you need here.
