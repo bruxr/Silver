@@ -13,7 +13,6 @@ namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
 use App\Services\Log;
-
 use DatePeriod;
 use DateInterval;
 use Carbon\Carbon;
@@ -148,7 +147,7 @@ class Nccc extends Base
         
         if ( ! in_array($rating, static::$RATINGS) )
         {
-          Log::warning(sprintf('[NCCC] Unknown MTRCB rating "%s", removing it for now.', $rating));
+          $this->logger->addWarning(sprintf('[NCCC] Unknown MTRCB rating "%s", removing it for now.', $rating));
         }
         else
         {
@@ -187,7 +186,7 @@ class Nccc extends Base
       // If this is an unknown line, log it so we know.
       elseif ( $line != 'Schedule' && $line != '' )
       {
-        Log::notice(sprintf('[NCCC] Unknown line "%s" cannot be processed.', $line));
+        $this->logger->addNotice(sprintf('[NCCC] Unknown line "%s" cannot be processed.', $line));
       }
       
     }

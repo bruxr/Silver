@@ -3,6 +3,7 @@
 namespace App\Scrapers;
 
 use phpQuery;
+use Monolog\Logger;
 
 /**
  * Scraper Base
@@ -29,6 +30,13 @@ abstract class Base
    * @var array
    */
   protected $movies = [];
+
+    /**
+     * A reference to the app logger.
+     * 
+     * @var Monolog\Logger
+     */
+    protected $logger;
   
   /**
    * Does the actual scraping of movie schedules.
@@ -37,6 +45,16 @@ abstract class Base
    */
   abstract public function fetch();
   
+    /**
+     * Constructor.
+     * 
+     * @param Logger $logger a reference to the logger
+     */
+    function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
   /**
    * Returns TRUE if we have collected schedules.
    *

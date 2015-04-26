@@ -14,7 +14,6 @@ namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
 use App\Services\Log;
-
 use Carbon\Carbon;
 
 class SmMalls extends Base
@@ -193,7 +192,7 @@ class SmMalls extends Base
     }
     elseif ( ! in_array($rating, self::$RATINGS) )
     {
-      Log::warning(sprintf('[SM] Unknown MTRCB rating %s. Ignoring rating.', $rating));
+      $this->logger->addWarning(sprintf('[SM] Unknown MTRCB rating %s. Ignoring rating.', $rating));
       return null;
     }
     else

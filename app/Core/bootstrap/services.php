@@ -50,4 +50,33 @@ $app['logger'] = function($c) {
     }
     return $log;
 };
-$app['logger']->addInfo('ready.');
+
+// Abreeza scraper
+$app['abreeza'] = function($c) {
+    return new App\Scrapers\Abreeza($c['logger']);
+};
+
+// Gaisano Grand scraper
+$app['gaisano_grand'] = function($c) {
+    return new App\Scrapers\GaisanoGrand($c['logger']);
+};
+
+// Gaisano Mall of Davao scraper
+$app['gaisano_mall'] = function($c) {
+    return new App\Scrapers\GaisanoMall($c['logger']);
+};
+
+// NCCC Mall scraper
+$app['nccc'] = function($c) {
+    return new App\Scrapers\Nccc($c['logger']);
+};
+
+// SM City Davao scraper
+$app['sm_davao'] = function($c) {
+    return new App\Scrapers\SmCityDavao($c['logger']);
+};
+
+// SM Lanang Premiere scraper
+$app['sm_lanang'] = function($c) {
+    return new App\Scrapers\SmLanang($c['logger']);
+};

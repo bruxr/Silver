@@ -13,9 +13,7 @@
 namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
-use App\Services\Log;
 use App\Services\ClientFactory;
-
 use DatePeriod;
 use DateInterval;
 use Carbon\Carbon;
@@ -231,7 +229,7 @@ class GaisanoMalls extends Base
         $rating = 'R-18';
         break;
       default:
-        Log::error(sprintf('[Gmall] Ignoring unknown MTRCB rating "%s".', $rating));
+        $this->logger->addError(sprintf('[Gmall] Ignoring unknown MTRCB rating "%s".', $rating));
         $rating = null;
         break;
     }

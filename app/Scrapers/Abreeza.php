@@ -12,8 +12,6 @@
 namespace App\Scrapers;
 
 use App\Exceptions\ParseException;
-use App\Services\Log;
-
 use Carbon\Carbon;
 
 class Abreeza extends Base
@@ -85,7 +83,7 @@ class Abreeza extends Base
     $movie = $this->cleanMovieTitle($movie);
     if ( empty($movie) )
     {
-      Log::critical('[Abreeza] Failed to extract a movie title.');
+      $this->logger->addCritical('[Abreeza] Failed to extract a movie title.');
       return;
     }
     else
@@ -124,7 +122,7 @@ class Abreeza extends Base
     $rating = str_replace('Rating: ', '', $rating);
     if ( ! in_array($rating, static::$RATINGS) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating for the movie "%s". Removing it for now.', $rating, $movie));
+      $this->logger->addWarning(sprintf('[Abreeza] "%s" is not a valid MTRCB rating for the movie "%s". Removing it for now.', $rating, $movie));
     }
     else
     {
@@ -136,7 +134,7 @@ class Abreeza extends Base
     $price = trim($price);
     if ( ! preg_match('/^[0-9]+$/', $price) )
     {
-      Log::warning(sprintf('[Abreeza] "%s" is not a valid ticket price for the movie "%s".', $price, $movie));
+      $this->logger->addWarning(sprintf('[Abreeza] "%s" is not a valid ticket price for the movie "%s".', $price, $movie));
       $price = null;
     }
     else
@@ -159,7 +157,7 @@ class Abreeza extends Base
       $s = trim(pq($s)->text());
       if ( ! preg_match('/((?:1[012]|[1-9]):[0-5][0-9]\s(?i)(?:am|pm))/', $s, $matches) )
       {
-        Log::warning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $movie));
+        $this->logger->addWarning(sprintf('[Abreeza] "%s" is not a valid time for "%s". Skipping.', $s, $movie));
         continue;
       }
       else
