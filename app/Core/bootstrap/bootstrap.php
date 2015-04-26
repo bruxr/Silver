@@ -9,13 +9,13 @@ define('CONFIG', ROOT . '/config');
 
 require_once ROOT . '/vendor/autoload.php';
 
-$app = new \Slim\App();
+$app = new \Slim\Slim();
 
 require_once CORE . '/bootstrap/environment.php';
 require_once CORE . '/bootstrap/services.php';
 
 $app->get('/', function() {
-    echo 'hello world.';
+    echo 'hello world!';
 });
 
 // Run the app if we aren't in CLI mode.
