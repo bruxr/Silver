@@ -15,21 +15,21 @@ class SluggableTest extends TestCase {
 
     public function testSluggable()
     {
-        $p = new Person([], $this->ds);
+        $p = new SluggablePerson([], $this->ds);
         $p->name = 'John Doe';
         $this->assertEquals('john-doe', $p->id);
     }
 
     public function testDuplicationPrevention($value='')
     {
-        $p = new Person([], $this->ds);
+        $p = new SluggablePerson([], $this->ds);
         $p->name = 'Unknown Guy';
         $this->assertEquals('unknown-guy2', $p->id);
     }
 
 }
 
-class Person extends Model {
+class SluggablePerson extends Model {
     use Sluggable;
 
     protected function setup()
