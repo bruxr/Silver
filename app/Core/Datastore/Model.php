@@ -4,6 +4,8 @@ use ReflectionClass;
 use App\Core\Observable;
 use Carbon\Carbon;
 use Doctrine\Common\Inflector\Inflector;
+use Respect\Validation\Validator;
+use Respect\Validation\Exceptions\NestedValidationExceptionInterface;
 
 /**
  * Model Class
@@ -56,18 +58,35 @@ abstract class Model implements \JsonSerializable {
   protected $kind = null;
 
     /**
-     * Converts data types to rules understood the our validation library
-     *
-     * @var  array
+     * This entity's validation errors.
+     * 
+     * @var array
      */
-    protected static $DATA_TYPES_TO_RULES = [
-        'boolean'   => 'bool',
-        'datetime'  => 'date',
-        'double'    => 'float',
-        'entity'    => 'object',
-        'integer'   => 'int',
-        'list'      => 'arr'
-    ];
+    protected $validationErrors = [];
+
+    /**
+     * The model's custom validation rules.
+     * 
+     * This varible should be an associative array with
+     * fields as the array's keys and a string or array of rules as their values.
+     * Example:
+     * [
+     *   'name'     => 'alnum|notEmpty',
+     *   'age'      => 'positive|min:1,true',
+     *   'website'  => ['notEmpty', 'Url', ['Custom Rule', 'arg1', 'arg2']]
+     * ]
+     * 
+     * @var array
+     */
+    protected static $validationRules = [];
+
+    /**
+     * Contains the processed validation rules so we don't need
+     * to reprocess the rules everytime we need them.
+     * 
+     * @var array
+     */
+    protected static $_validationRules = null;
 
     /**
      * Constructor
@@ -192,6 +211,89 @@ abstract class Model implements \JsonSerializable {
     }
   }
 
+    /**
+     * Performs a validation check.
+     * 
+     * @return boolean
+     */
+    public function check()
+    {
+        $this->validationErrors = [];
+        $result = true;
+        $all_rules = static::buildValidationRules();
+        $fields = array_keys($this->getProperties());
+        foreach ( $all_rules as $field => $rules )
+        {
+
+            if ( isset($rules['required']) )
+            {
+                $required_field = true;
+                unset($rules['required']);
+            }
+            else
+            {
+                $required_field = false;
+            }
+
+            // Add our rules to the validator chain
+            $v = new Validator();
+            foreach ( $rules as $rule => $rule_args )
+            {
+                call_user_func_array(array($v, $rule), $rule_args);
+            }
+
+            // Assert the value
+            $errors = [];
+            $passed = true;
+            if ( $this->has($field) )
+            {
+                try
+                {
+                    $passed = $v->assert($this->get($field));
+                }
+                catch ( NestedValidationExceptionInterface $ex )
+                {
+                    $passed = false;
+                    $this->validationErrors[$field] = array_filter($ex->findMessages(array_keys($rules)));
+                }
+            }
+            elseif ( ! $this->has($field) && $required_field )
+            {
+                $errors[] = sprintf('"%s" is required.', $field);
+                $passed = false;
+            }
+
+            // If one rule fails, all fails.
+            if ( $passed === false )
+            {
+                $result = false;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns TRUE if the entity's properties follow the model's custom
+     * and default validation rules.
+     * 
+     * @return boolean
+     */
+    public function isValid()
+    {
+        return $this->check();
+    }
+
+    /**
+     * Returns this entity's validation errors. Call this method after
+     * invoking isValid().
+     * 
+     * @return array
+     */
+    public function validationErrors()
+    {
+        return $this->validationErrors;
+    }
+
   /**
    * Returns an array of properties that hasn't been saved yet.
    *
@@ -213,28 +315,35 @@ abstract class Model implements \JsonSerializable {
     return $props;
   }
 
-  /**
-   * Saves the model to the datastore.
-   *
-   * @param App\Core\Datastore\DS $ds optional. save the model to this Datastore
-   * @return this
-   */
-  public function save(Datastore $ds = null)
-  {
-    if ( $this->isDirty() )
+    /**
+     * Saves the model to the datastore.
+     *
+     * @param App\Core\Datastore\DS $ds optional. save the model to this Datastore
+     * @return this
+     */
+    public function save(Datastore $ds = null)
     {
-      if ( $ds === null && $this->ds !== null )
-      {
-        $ds = $this->ds;
-      }
-      elseif ( $ds === null && $this->ds === null )
-      {
-        throw new \Exception('Cannot save model without a datastore.');
-      }
-      $ds->put($this);
+        if ( $this->isDirty() )
+        {
+            $this->trigger('before_validate', $this);
+            if ( $this->isValid() )
+            {
+                $this->trigger('after_validate', $this);
+                if ( $ds === null && $this->ds !== null )
+                {
+                    $ds = $this->ds;
+                }
+                elseif ( $ds === null && $this->ds === null )
+                {
+                    throw new \Exception('Cannot save model without a datastore.');
+                }
+                $this->trigger('before_save', $this);
+                $ds->put($this);
+                $this->trigger('after_save', $this);
+            }
+        }
+        return $this;
     }
-    return $this;
-  }
 
   /**
    * Clears any unsaved properties, making the entity "clean" again.
@@ -372,5 +481,75 @@ abstract class Model implements \JsonSerializable {
   {
     return $this->has($name);
   }
+
+    /**
+     * Formats the validation rules set on this model for easier
+     * processing later on.
+     * 
+     * Returns an associative array with keys as entity field names
+     * and an array of validation rules as values.
+     * 
+     * @return array
+     */
+    protected static function buildValidationRules()
+    {
+        if ( static::$_validationRules === null )
+        {
+          $all_rules = static::$validationRules;
+          foreach ( $all_rules as $field => $rules )
+          {
+              // Process string rules (e.g. int|min:5)
+              if ( is_string($rules) )
+              {
+                  $all_rules[$field] = static::processStringRules($rules);
+              }
+              // For arrays, make sure the keys are the rules.
+              elseif ( is_array($rules) )
+              {
+                  $all_rules[$field] = static::processArrayRules($rules);
+              }
+          }
+          static::$_validationRules = $all_rules;
+        }
+        return static::$_validationRules;
+    }
+
+    protected static function processStringRules($rules)
+    {
+        $validators = explode('|', $rules);
+        $result = [];
+        foreach ( $validators as $v )
+        {
+            // Process arguments, if they're present.
+            $v = explode(':', $v);
+            if ( count($v) > 1 )
+            {
+                $v_args = explode(',', $v[1]);
+            }
+            else
+            {
+                $v_args = [];
+            }
+            $result[$v[0]] = $v_args;
+        }
+        return $result;
+    }
+
+    protected static function processArrayRules($rules)
+    {
+        $new_rules = [];
+        foreach ( $rules as $index => $v )
+        {
+            if ( is_int($index) )
+            {
+                $new_rules[$v] = [];
+            }
+            else
+            {
+                $new_rules[$index] = $v;
+            }
+        }
+        return $new_rules;
+    }
 
 }

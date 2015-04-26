@@ -12,6 +12,12 @@ class Person extends App\Core\Datastore\Model
 
 class Car extends App\Core\Datastore\Model
 {
+    public static $validationRules = [
+        'price' => 'int|min:0',
+        'url'   => ['string', 'domain' => [false]],
+        'owner' => 'required'
+    ];
+
     public function getOwner()
     {
         return $this->belongsTo('Person', ['foreign_key' => 'owner_id']);
@@ -116,6 +122,32 @@ class ModelTest extends TestCase
         $car->purchased = Carbon::parse('2015-04-22');
         $json = json_encode($car);
         $this->assertEquals('{"name":"Skyline","price":3000000,"purchased":"2015-04-22T00:00:00+0800"}', $json);
+    }
+
+    public function testValidation()
+    {
+        $fields = [
+            ['car', 'name', 'string'],
+            ['car', 'is_legit', 'boolean'],
+            ['car', 'purchased', 'datetime']
+        ];
+        $schema = $this->getMockBuilder('App\Core\Datastore\Schema')
+                       ->getMock();
+        $schema->method('getFieldType')
+               ->will($this->returnValueMap($fields));
+
+        $car = new Car([], null, $schema);
+        $car->name = 'Supra';
+        $car->price = '3 million';
+        $car->is_legit = true;
+        $car->url = 'dev.localhost.local';
+        $this->assertFalse($car->isValid());
+
+        $car->price = 3000000;
+        $this->assertFalse($car->isValid());
+
+        $car->owner = 'me';
+        $this->assertTrue($car->isValid());
     }
 
 }
