@@ -1,6 +1,6 @@
 <?php
 /**
- * Gaisano Grand Scraper
+ * Gaisano Mall of Davao Scraper
  *
  * @package Silver
  * @author brux
@@ -9,10 +9,10 @@
 
 namespace App\Scrapers;
 
-class GaisanoGrand extends GaisanoMalls
+class GaisanoMall extends GaisanoMalls
 {
   
-  const SLUG = 'gaisano-grand';
+  const SLUG = 'gaisano-mall';
   
   const MALL = 'TORIL';
 

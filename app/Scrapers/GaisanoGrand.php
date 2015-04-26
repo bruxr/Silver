@@ -9,10 +9,10 @@
 
 namespace App\Scrapers;
 
-class GaisanoMall extends GaisanoMalls
+class GaisanoGrand extends GaisanoMalls
 {
   
-  const SLUG = 'gaisano-mall';
+  const SLUG = 'gaisano-grand';
   
   const MALL = 'DAVAO';
 
