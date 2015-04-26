@@ -13,3 +13,5 @@ $app = new \Slim\App();
 
 require_once CORE . '/bootstrap/environment.php';
 require_once CORE . '/bootstrap/services.php';
+
+$app->run();
