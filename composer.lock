@@ -119,12 +119,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "5f7ad78ac7e5723b43f1ca369215c559c05355e0"
+                "reference": "1db3e929502e1fba4f74c929e4b4986a538a159c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/5f7ad78ac7e5723b43f1ca369215c559c05355e0",
-                "reference": "5f7ad78ac7e5723b43f1ca369215c559c05355e0",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/1db3e929502e1fba4f74c929e4b4986a538a159c",
+                "reference": "1db3e929502e1fba4f74c929e4b4986a538a159c",
                 "shasum": ""
             },
             "require": {
@@ -153,7 +153,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2015-04-18 12:40:00"
+            "time": "2015-04-25 12:46:03"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -518,16 +518,16 @@
         },
         {
             "name": "respect/validation",
-            "version": "0.8.5",
+            "version": "0.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Respect/Validation.git",
-                "reference": "8ca24c2f84b2d4cdc5f227487f62d4d5c5d714ea"
+                "reference": "0e9044de816a6faef2657aaa49c767df445762cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Respect/Validation/zipball/8ca24c2f84b2d4cdc5f227487f62d4d5c5d714ea",
-                "reference": "8ca24c2f84b2d4cdc5f227487f62d4d5c5d714ea",
+                "url": "https://api.github.com/repos/Respect/Validation/zipball/0e9044de816a6faef2657aaa49c767df445762cd",
+                "reference": "0e9044de816a6faef2657aaa49c767df445762cd",
                 "shasum": ""
             },
             "require": {
@@ -574,7 +574,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2015-04-17 03:03:36"
+            "time": "2015-04-24 22:19:42"
         },
         {
             "name": "slim/slim",
