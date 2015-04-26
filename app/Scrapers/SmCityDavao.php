@@ -12,7 +12,7 @@ namespace App\Scrapers;
 class SmCityDavao extends SmMalls
 {
   
-  const SLUG = 'smcitydavao';
+  const SLUG = 'sm-city-davao';
   
   const BRANCH_CODE = 'SMCD';
 

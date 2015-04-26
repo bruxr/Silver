@@ -12,7 +12,7 @@ namespace App\Scrapers;
 class SmLanang extends SmMalls
 {
   
-  const SLUG = 'smlanang';
+  const SLUG = 'sm-lanang';
   
   const BRANCH_CODE = 'SMLA';
 
