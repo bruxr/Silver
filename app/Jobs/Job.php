@@ -38,7 +38,8 @@ abstract class Job
   {
     $class = (new \ReflectionClass(get_called_class()))->getShortName();
     $dashed_name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $class));
-    $args = implode('/', func_get_args());
+    $args = array_map('rawurlencode', func_get_args());
+    $args = implode('/', $args);
     (new PushTask("/jobs/$dashed_name/$args"))->add();
   }
   
