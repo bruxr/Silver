@@ -19,7 +19,7 @@ $app->get('/', function() {
 });
 
 // Run the app if we aren't in CLI mode.
-if ( php_sapi_name() !== 'cli' )
+if ( ! SILVER_CLI_MODE )
 {
     $app->run();
 }
