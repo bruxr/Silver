@@ -37,7 +37,7 @@ abstract class Job
   public static function enqueue()
   {
     $class = (new \ReflectionClass(get_called_class()))->getShortName();
-    $dashed_name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
+    $dashed_name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $class));
     $args = implode('/', func_get_args());
     (new PushTask("/jobs/$dashed_name/$args"))->add();
   }
