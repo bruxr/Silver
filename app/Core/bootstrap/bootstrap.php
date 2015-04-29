@@ -13,7 +13,7 @@ require_once CORE . '/bootstrap/environment.php';
 require_once CORE . '/bootstrap/services.php';
 
 // Do app config based on the environment
-require_once CORE . '/boostrap/environment/' . SILVER_MODE . '.php';
+require_once CORE . '/bootstrap/environment/' . SILVER_MODE . '.php';
 
 $app->get('/', function() {
     echo 'hello world!';
