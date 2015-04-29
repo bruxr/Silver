@@ -29,7 +29,7 @@ $app->container->singleton('datastore_schema', function($c) {
 
 // GCD
 $app->container->singleton('datastore_driver', function($c) {
-    return new App\Core\Datastore\GCD(getenv('APP_ID'), $c['google_client'], $c['datastore_schema']);
+    return new App\Core\Datastore\Drivers\GCD(getenv('APP_ID'), $c['google_client'], $c['datastore_schema']);
 });
 
 // DS
