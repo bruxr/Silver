@@ -2,3 +2,4 @@
 /node_modules
 .env
 /config/silver-key.p12
+/storage
