@@ -1,7 +1,5 @@
 <?php
 
-use App\Core\Middleware;
-
 define('ROOT', dirname(dirname(dirname(dirname(__FILE__)))));
 define('APP', ROOT . '/app');
 define('CORE', APP . '/Core');
