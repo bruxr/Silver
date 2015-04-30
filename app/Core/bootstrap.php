@@ -33,6 +33,7 @@ $app['datastore_driver'] = 'App\Core\Datastore\Drivers\GCD';
 
 // Add our core service providers
 $app->register(new Providers\Log());
+$app->register(new Providers\Bus());
 $app->register(new Providers\Google());
 $app->register(new Providers\Datastore());
 

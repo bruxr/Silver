@@ -1,7 +1,7 @@
 <?php namespace App\Core;
 
 /**
- * Command Bus Class
+ * Command Bus Dispatcher
  * 
  * This class is responsible for executing commands synchronously or
  * asynchronously through App Engine's Task Queues.
@@ -10,7 +10,7 @@
  * @author Brux
  * @since 0.1.0
  */
-class CommandBus
+class Dispatcher
 {
     
     /**

@@ -1,6 +1,6 @@
-<?php namespace App\Core;
+<?php namespace App\Core\Bus;
 
-abstract class AbstractCommand
+abstract class Command
 {
 
     protected $data;
