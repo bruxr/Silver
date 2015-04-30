@@ -46,11 +46,15 @@ $app->register(new Providers\Bus());
 $app->register(new Providers\Google());
 $app->register(new Providers\Datastore());
 
+// Load the app boostrap
+require_once APP . '/bootstrap.php';
+
 // Load root routes if we aren't on CLI mode
 if ( ! SILVER_CLI )
 {
-    require_once APP . '/Routes/roots.php';
+    $routes = require_once APP . '/routes.php';
+    foreach ( $routes as $file )
+    {
+        require_once sprintf('%s/Routes/%s.php', APP, $file);
+    }
 }
-
-// Load the app boostrap
-require_once APP . '/bootstrap.php';
