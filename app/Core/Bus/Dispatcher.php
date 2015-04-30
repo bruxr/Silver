@@ -74,6 +74,7 @@ class Dispatcher
      * App Engine's Task queues.
      * 
      * @param  Command $command the command
+     * @return PushTask
      */
     public function enqueue(Command $command)
     {
@@ -82,6 +83,7 @@ class Dispatcher
         $data = $command->getData();
         $task = new PushTask(sprintf('jobs/%s', $command), $data);
         $task->add();
+        return $task;
     }
 
     /**
