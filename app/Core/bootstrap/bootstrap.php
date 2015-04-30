@@ -10,7 +10,6 @@ define('CONFIG', ROOT . '/config');
 require_once ROOT . '/vendor/autoload.php';
 
 $app = new App\Core\SilverApp();
-$app->add(new Middleware\Rest());
 $app->add(new Middleware\LazyRoutes());
 
 require_once CORE . '/bootstrap/services.php';
