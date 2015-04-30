@@ -51,3 +51,6 @@ if ( ! SILVER_CLI )
 {
     require_once APP . '/Routes/roots.php';
 }
+
+// Load the app boostrap
+require_once APP . '/bootstrap.php';
