@@ -61,6 +61,10 @@ final class SilverApp extends \Slim\Slim
             return $log;
         });
         $this->getLog()->setWriter(new LogAdapter($this->logger));
+
+        // Setup Error handlers
+        $this->error(array($this, 'handleError'));
+        $this->notFound(array($this, 'handleNotFound'));
     }
 
     public function mode($mode = null)
@@ -74,6 +78,34 @@ final class SilverApp extends \Slim\Slim
         {
             return $mode === $app_mode;
         }
+    }
+
+    protected function handleError(\Exception $e)
+    {
+        if ( $e instanceof \InvalidArgumentException )
+        {
+            $status_code = 422;
+        }
+        else
+        {
+            $status_code = 500;
+        }
+
+        $vars = ['message' => $e->getMessage()];
+
+        if ( $this->isAjax() )
+        {
+            $this->render('errors/error.json.php', $vars, $status_code);
+        }
+        else
+        {
+            $this->render('errors/error.php', $vars, $status_code);
+        }
+    }
+
+    protected function handleNotFound()
+    {
+
     }
 
 }
