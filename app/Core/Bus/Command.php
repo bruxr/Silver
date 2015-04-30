@@ -12,6 +12,6 @@ abstract class Command
 
     public function getData()
     {
-        return $data;
+        return $this->data;
     }
 }
