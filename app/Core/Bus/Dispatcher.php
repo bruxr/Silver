@@ -79,9 +79,9 @@ class Dispatcher
      */
     public function enqueue(Command $command)
     {
+        $data = $command->getData();
         $command = (new \ReflectionClass($command))->getName();
         $command = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $command));
-        $data = $command->getData();
         $task = new PushTask(sprintf('jobs/%s', $command), $data);
         $task->add();
         return $task;
