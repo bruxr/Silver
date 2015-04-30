@@ -57,6 +57,8 @@ class Dispatcher
     {
         $this->queue[] = $command;
 
+        $this->container['log']->addInfo(sprintf('The command "%s" has been queued for processing.', get_class($command)));
+
         if ( ! $this->isProcessing )
         {
             $this->isProcessing = true;
@@ -95,6 +97,8 @@ class Dispatcher
      */
     public function execute(Command $command)
     {
+        $this->container['log']->addInfo(sprintf('Preparing to execute the command "%s".', get_class($command)));
+
         $params = (new \ReflectionClass($command))->getMethod('execute')->getParameters();
         $p = [];
         foreach ( $params as $param )
@@ -102,6 +106,8 @@ class Dispatcher
             $p[] = $this->container[$param->getClass()->getName()];
         }
         call_user_func_array(array($command, 'execute'), $p);
+
+        $this->container['log']->addInfo(sprintf('Command "%s" successfully executed.', get_class($command)));
     }
 
 }
