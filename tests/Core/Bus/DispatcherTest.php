@@ -5,17 +5,19 @@ use App\Core\Bus\Dispatcher;
 class DispatcherTest extends TestCase
 {
 
-    public function testDispatch()
+    public function setUp()
     {
         $container = new Pimple\Container();
         $container['Monolog\Logger'] = function() {
             return new Monolog\Logger('test');
         };
+        $this->bus = new Dispatcher($container);
+    }
 
+    public function testDispatch()
+    {
         $GLOBALS['test_var'] = 1;
-        $bus = new Dispatcher($container);
-        $bus->handle(new TestCommand());
-
+        $this->bus->handle(new TestCommand());
         $this->assertEquals(2, $GLOBALS['test_var']);
     }
 
