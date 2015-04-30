@@ -5,42 +5,42 @@ use google\appengine\api\taskqueue\PushTask;
 
 /**
  * Command Bus Dispatcher
- * 
+ *
  * This class is responsible for executing commands synchronously or
  * asynchronously through App Engine's Task Queues.
- * 
+ *
  * @package Silver
  * @author Brux
  * @since 0.1.0
  */
 class Dispatcher
 {
-    
+
     /**
      * Internal flag used to detect if the class at that time
      * processing a command.
-     * 
+     *
      * @var boolean
      */
     protected $isProcessing = false;
 
     /**
      * Command queue.
-     * 
+     *
      * @var array
      */
     protected $queue = [];
 
     /**
      * The app container for easily resolving any dependencies.
-     * 
+     *
      * @var object
      */
     protected $container;
 
     /**
      * Constructor.
-     * 
+     *
      * @param object $container service container
      */
     public function __construct(Container $container = null)
@@ -50,17 +50,17 @@ class Dispatcher
 
     /**
      * Queues a command for immediate processing.
-     * 
+     *
      * @param Command $command the command
      */
     public function handle(Command $command)
     {
         $this->queue[] = $command;
-        
+
         if ( ! $this->isProcessing )
         {
             $this->isProcessing = true;
-            
+
             while ( $command = array_shift($this->queue) )
             {
                 $this->execute($command);
@@ -73,7 +73,7 @@ class Dispatcher
     /**
      * Queues a command for processing later through
      * App Engine's Task queues.
-     * 
+     *
      * @param  Command $command the command
      * @return PushTask
      */
@@ -90,7 +90,7 @@ class Dispatcher
     /**
      * Immediately runs a command. This will also resolve any needed
      * dependencies typehinted in the command's execute method.
-     * 
+     *
      * @param  Command $command the command
      */
     public function execute(Command $command)
