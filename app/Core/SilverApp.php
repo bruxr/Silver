@@ -27,7 +27,6 @@ final class SilverApp extends \Slim\Slim
         // Setup default app settings
         $settings = [
             'templates.path'        => APP . '/Templates',
-            'view'                  => new MorphingView(),
             'cookies.encrypt'       => true,
             'cookies.httponly'      => true,
             'cookies.secret_key'    => getenv('COOKIE_SECRET')
