@@ -12,7 +12,7 @@ $app->get('/jobs/{command:[a-z\-]+}', function($req, $resp, $args) {
     $command_class = ucwords(mb_ereg_replace('-', ' ', $args['command']));
     $command_class = mb_ereg_replace(' ', '', $command_class);
     $command_class = 'App\Commands\\' . $command_class;
-    if ( isset($this[$command_class]) )
+    if ( class_exists($command_class) )
     {
         $command = new $command_class($req->post());
         $this['bus']->handle($command);
