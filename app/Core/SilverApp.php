@@ -48,7 +48,7 @@ final class SilverApp extends \Slim\Slim
         parent::__construct($settings);
 
         // Setup the logger
-        $this->container->singleton('logger', function($c) {
+        $this->container->singleton('Monolog\Logger', function($c) {
             $log = new \Monolog\Logger('silver');
             if ( $settings['mode'] == 'development' )
             {
@@ -60,11 +60,15 @@ final class SilverApp extends \Slim\Slim
             }
             return $log;
         });
-        $this->getLog()->setWriter(new LogAdapter($this->logger));
+        $this->getLog()->setWriter(new LogAdapter($this->container->get('Monolog\Logger')));
 
         // Setup Error handlers
         $this->error(array($this, 'handleError'));
         $this->notFound(array($this, 'handleNotFound'));
+
+        // Load app services
+        $container = $this->container;
+        require_once APP . '/services.php';
     }
 
     public function mode($mode = null)

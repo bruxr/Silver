@@ -9,66 +9,30 @@ $app->container->set('google_auth_scopes', function() {
 });
 
 // Google_Auth_AssertionCredentials
-$app->container->singleton('google_auth_assertioncredentials', function($c) {
+$app->container->singleton('Google_Auth_AssertionCredentials', function($c) {
     $key = CONFIG . '/silver-key.p12';
     return new Google_Auth_AssertionCredentials(getenv('APP_SERVICE_ACCT'), $c['google_auth_scopes'], file_get_contents($key));
 });
 
 // Google_Client
-$app->container->singleton('google_client', function($c) {
+$app->container->singleton('Google_Client', function($c) {
     $gc = new Google_Client();
     $gc->setApplicationName(getenv('APP_ID'));
-    $gc->setAssertionCredentials($c['google_auth_assertioncredentials']);
+    $gc->setAssertionCredentials($c['Google_Auth_AssertionCredentials']);
     return $gc;
 });
 
 // Datastore Schema
-$app->container->singleton('datastore_schema', function($c) {
+$app->container->singleton('App\Core\Datastore\Schema', function($c) {
     return new App\Core\Datastore\Schema(CONFIG . '/schema.php');
 });
 
 // GCD
-$app->container->singleton('datastore_driver', function($c) {
+$app->container->singleton('App\Core\Datastore\Drivers\GCD', function($c) {
     return new App\Core\Datastore\Drivers\GCD(getenv('APP_ID'), $c['google_client'], $c['datastore_schema']);
 });
 
 // DS
-$app->container->singleton('datastore', function($c) {
+$app->container->singleton('App\Core\Datastore\Datastore', function($c) {
     return new App\Core\Datastore\Datastore($c['datastore_driver']);
-});
-
-});
-
-// -----------------------------------------------------------------------------
-// SCRAPERS
-// -----------------------------------------------------------------------------
-
-// Abreeza scraper
-$app->container->singleton('abreeza', function($c) {
-    return new App\Scrapers\Abreeza($c['logger']);
-});
-
-// Gaisano Grand scraper
-$app->container->singleton('gaisano_grand', function($c) {
-    return new App\Scrapers\GaisanoGrand($c['logger']);
-});
-
-// Gaisano Mall of Davao scraper
-$app->container->singleton('gaisano_mall', function($c) {
-    return new App\Scrapers\GaisanoMall($c['logger']);
-});
-
-// NCCC Mall scraper
-$app->container->singleton('nccc', function($c) {
-    return new App\Scrapers\Nccc($c['logger']);
-});
-
-// SM City Davao scraper
-$app->container->singleton('sm_davao', function($c) {
-    return new App\Scrapers\SmCityDavao($c['logger']);
-});
-
-// SM Lanang Premiere scraper
-$app->container->singleton('sm_lanang', function($c) {
-    return new App\Scrapers\SmLanang($c['logger']);
 });
