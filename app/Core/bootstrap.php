@@ -16,13 +16,22 @@ date_default_timezone_set('Asia/Manila');
 Dotenv::load(ROOT);
 
 // App Mode
-if ( $_SERVER['SERVER_NAME'] == 'localhost' )
+if ( php_sapi_name() == 'cli' )
 {
     define('SILVER_MODE', 'development');
+    define('SILVER_CLI', true);
 }
 else
 {
-    define('SILVER_MODE', 'production');
+    define('SILVER_CLI', false);
+    if ( $_SERVER['SERVER_NAME'] == 'localhost' )
+    {
+        define('SILVER_MODE', 'development');
+    }
+    else
+    {
+        define('SILVER_MODE', 'production');
+    }
 }
 
 // Initialize our app
@@ -37,4 +46,8 @@ $app->register(new Providers\Bus());
 $app->register(new Providers\Google());
 $app->register(new Providers\Datastore());
 
-require_once APP . '/Routes/roots.php';
+// Load root routes if we aren't on CLI mode
+if ( ! SILVER_CLI )
+{
+    require_once APP . '/Routes/roots.php';
+}
