@@ -2,7 +2,7 @@
 	"name": "brux/Silver",
 	"description": "Davao's moves in one place.",
 	"require": {
-        "slim/slim": "~2.0",
+        "slim/slim": "3.0.x-dev",
         "electrolinux/phpquery": "dev-master",
         "monolog/monolog": "~1.13",
         "symfony/yaml": "~2.6",
