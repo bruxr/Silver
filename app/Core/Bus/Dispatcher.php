@@ -103,7 +103,15 @@ class Dispatcher
         $p = [];
         foreach ( $params as $param )
         {
-            $p[] = $this->container[$param->getClass()->getName()];
+            $dep = $param->getClass()->getName();
+            if ( $dep === 'Pimple\Container' )
+            {
+                $p[] = $this->container;
+            }
+            else
+            {
+                $p[] = $this->container[$dep];
+            }
         }
         call_user_func_array(array($command, 'execute'), $p);
 
