@@ -1,5 +1,5 @@
 <?php
 
-$app->get('/', function() use ($app) {
-    $app->render('home.php', ['cars' => ['R8', 'Skyline', 'Supra']]);
+$app->get('/', function($req, $resp, $args) {
+    $resp->write('hello world!');
 });
