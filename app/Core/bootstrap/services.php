@@ -37,19 +37,11 @@ $app->container->singleton('datastore', function($c) {
     return new App\Core\Datastore\Datastore($c['datastore_driver']);
 });
 
-// Logger
-$app->container->singleton('logger', function($c) {
-    $log = new Monolog\Logger('silver');
-    if ( SILVER_MODE == 'dev' )
-    {
-        $log->pushHandler(new Monolog\Handler\RotatingFileHandler(ROOT . '/storage/logs/silver'));
-    }
-    else
-    {
-        $log->pushHandler(new Monolog\Handler\SyslogHandler('app'));
-    }
-    return $log;
 });
+
+// -----------------------------------------------------------------------------
+// SCRAPERS
+// -----------------------------------------------------------------------------
 
 // Abreeza scraper
 $app->container->singleton('abreeza', function($c) {
