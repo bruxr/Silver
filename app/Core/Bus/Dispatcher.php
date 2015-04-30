@@ -1,4 +1,6 @@
-<?php namespace App\Core;
+<?php namespace App\Core\Bus;
+
+use Pimple\Container;
 
 /**
  * Command Bus Dispatcher
@@ -40,7 +42,7 @@ class Dispatcher
      * 
      * @param object $container service container
      */
-    public function __construct($container)
+    public function __construct(Container $container = null)
     {
         $this->container = $container;
     }
@@ -48,11 +50,11 @@ class Dispatcher
     /**
      * Queues a command for immediate processing.
      * 
-     * @param CommandInterface $command the command
+     * @param Command $command the command
      */
-    public function handle(CommandInterface $command)
+    public function handle(Command $command)
     {
-        $this->queue[] = $comand;
+        $this->queue[] = $command;
         
         if ( ! $this->isProcessing )
         {
@@ -71,13 +73,14 @@ class Dispatcher
      * Queues a command for processing later through
      * App Engine's Task queues.
      * 
-     * @param  CommandInterface $command the command
+     * @param  Command $command the command
      */
-    public function enqueue(CommandInterface $command)
+    public function enqueue(Command $command)
     {
-        $job = (new \ReflectionClass($command))->getShortName();
-        $job = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $job));
-        $task = new PushTask(sprintf('jobs/%s', $job), $args);
+        $command = (new \ReflectionClass($command))->getName();
+        $command = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $command));
+        $data = $command->getData();
+        $task = new PushTask(sprintf('jobs/%s', $command), $data);
         $task->add();
     }
 
@@ -85,15 +88,15 @@ class Dispatcher
      * Immediately runs a command. This will also resolve any needed
      * dependencies typehinted in the command's execute method.
      * 
-     * @param  CommandInterface $command the command
+     * @param  Command $command the command
      */
-    public function execute(CommandInterface $command)
+    public function execute(Command $command)
     {
         $params = (new \ReflectionClass($command))->getMethod('execute')->getParameters();
         $p = [];
         foreach ( $params as $param )
         {
-            $p[] = $this->container[$param->getClass()];
+            $p[] = $this->container[$param->getClass()->getName()];
         }
         call_user_func_array(array($command, 'execute'), $p);
     }

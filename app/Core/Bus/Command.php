@@ -10,8 +10,6 @@ abstract class Command
         $this->data = $data;
     }
 
-    public function execute();
-
     public function getData()
     {
         return $data;
