@@ -1,34 +1,14 @@
-# Silver
-Davao's movies in one place.
+# Silver API
+API only part of [Silver2](https://github.com/Silver2) that runs on the [Google App Engine](https://cloud.google.com/appengine). This app collects movie schedules daily and makes them available on several REST endpoints.
 
-## Developing
-1. Install [Composer](http://getcomposer.org).
-2. Download Silver's dependencies by doing a `composer install`.
-3. Install [Robo](http://robo.li) and then do a first time setup `robo unpack`.
+## Development
+Make sure you have at least PHP 5.4 and [Composer](https://getcomposer.org/download/).
+1. Do an initial `composer install` to download dependencies.
+2. Use the [Google App Engine Launcher](https://cloud.google.com/appengine/downloads?hl=en) to run the app.
+3. Profit!
 
-## Robo Reference
-Silver uses [Robo](http://robo.li) to perform some tasks (e.g. `robo fetch`).
+## Endpoints
+TODO: finish endpoints doc
 
-* `robo compile <all|css|js>` - Concatenates and minifies assets through gulp.
-`css` or `js` can be added to compile only CSS files or Javascript files.
-
-* `robo fetch <mall>` - Fetches screening schedules from all the malls and
-saves them to the database. A mall parameter can be added to fetch only from
-the said mall.
-
-* `robo prepare` - Prepares the app for deployment to Google App Engine. Will
-run the `test` suite then `compile` assets.
-
-* `robo seed` - Seeds the database, inserting initial app records.
-
-* `robo test` - Runs the test suite.
-
-* `robo update <all|info|scores>` - Updates movie data. An optional `info`
-or `scores` can be added to just update movie information or scores only.
-
-* `robo unpack` - Performs first time setup (`seed`, `compile`) so the app is
-ready to be used.
-
-## Deployment
-Prepare the app first by doing a `robo prepare` and then deploy the app using
-the Google App Engine launcher.
+## Notes
+This is currently under heavy development and I'm on the process of converting the initial Lumen based app to Slim for a leaner API.
