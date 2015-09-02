@@ -3,6 +3,7 @@ API only part of [Silver2](https://github.com/Silver2) that runs on the [Google 
 
 ## Development
 Make sure you have at least PHP 5.4 and [Composer](https://getcomposer.org/download/).
+
 1. Do an initial `composer install` to download dependencies.
 2. Use the [Google App Engine Launcher](https://cloud.google.com/appengine/downloads?hl=en) to run the app.
 3. Profit!
